@@ -16,6 +16,13 @@
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.5" />
+      <PackageReference Include="Riok.Mapperly" Version="4.3.0-next.0" />
+      <PackageReference Include="X.PagedList" Version="10.5.7" />
+      <PackageReference Include="X.PagedList.Mvc.Core" Version="10.5.7" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Views\Vehicles\" />
     </ItemGroup>
 
 </Project>

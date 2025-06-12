@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+@model WorkshopManager.DTOs.CustomerDto
+@{
+    ViewData["Title"] = "Customer Details";
+}
+<h1>Customer Details</h1>
+<div class="form-group">
+    <label>Name:</label>
+    <span>@Model.Name</span>
+</div>
+<div class="form-group">
+    <label>Email:</label>
+    <span>@Model.Email</span>
+</div>
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+<a asp-action="Index" class="btn btn-secondary">Back</a>
+</body>
+</html>

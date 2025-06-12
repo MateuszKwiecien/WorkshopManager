@@ -19,4 +19,20 @@ public class CustomerRepository : ICustomerRepository
         _context.Customers.Add(customer);
         await _context.SaveChangesAsync();
     }
+    
+    public async Task UpdateAsync(Customer customer)
+    {
+        _context.Customers.Update(customer);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var customer = await _context.Customers.FindAsync(id);
+        if (customer != null)
+        {
+            _context.Customers.Remove(customer);
+            await _context.SaveChangesAsync();
+        }
+    }
 }

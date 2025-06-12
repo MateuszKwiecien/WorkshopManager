@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+@model WorkshopManager.DTOs.CustomerDto
+@{
+    ViewData["Title"] = "Delete Customer";
+}
+<h1>Delete Customer</h1>
+<h3>Are you sure you want to delete this customer?</h3>
+<div>
+    <label>Name:</label> @Model.Name
+</div>
+<div>
+    <label>Email:</label> @Model.Email
+</div>
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+</body>
+</html>

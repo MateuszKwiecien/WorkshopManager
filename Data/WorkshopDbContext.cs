@@ -30,13 +30,28 @@ namespace WorkshopManager.Data
                 .HasIndex(v => v.RegistrationNumber)
                 .IsUnique();
 
-            // Relacje optional/required
+            // ServiceOrder: Vehicle relationship - restrict delete
+            modelBuilder.Entity<ServiceOrder>()
+                .HasOne(o => o.Vehicle)
+                .WithMany(v => v.ServiceOrders)
+                .HasForeignKey(o => o.VehicleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ServiceOrder: Customer relationship - cascade delete
+            modelBuilder.Entity<ServiceOrder>()
+                .HasOne(o => o.Customer)
+                .WithMany(c => c.ServiceOrders)
+                .HasForeignKey(o => o.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Comment: ServiceOrder relationship - restrict delete to avoid cascade path
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.ServiceOrder)
                 .WithMany(o => o.Comments)
                 .HasForeignKey(c => c.ServiceOrderId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
+            // Comment: Customer relationship - cascade delete
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.Customer)
                 .WithMany(u => u.Comments)
