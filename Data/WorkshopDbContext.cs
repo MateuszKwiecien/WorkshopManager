@@ -1,7 +1,8 @@
-﻿// Data/WorkshopDbContext.cs
+// Data/WorkshopDbContext.cs
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using WorkshopManager.Models;
+using WorkshopManager.DTOs;
 
 namespace WorkshopManager.Data
 {
@@ -52,5 +53,7 @@ namespace WorkshopManager.Data
                 .HasIndex(v => v.RegistrationNumber)
                 .IsUnique();
         }
+    public DbSet<WorkshopManager.DTOs.ServiceOrderDto> ServiceOrderDto { get; set; } = default!;
+    public DbSet<WorkshopManager.DTOs.VehicleDto> VehicleDto { get; set; } = default!;
     }
 }

@@ -31,8 +31,8 @@ builder.Services.AddMapster();
 // Generyczne repozytorium + serwisy biznesowe
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<ICustomerService, CustomerService>();
-// builder.Services.AddScoped<IVehicleService,  VehicleService>(); // gdy dodasz
-// builder.Services.AddScoped<IOrderService,    OrderService>();   // gdy dodasz
+builder.Services.AddScoped<IVehicleService,  VehicleService>();
+builder.Services.AddScoped<IOrderService,    OrderService>();
 
 // MVC + Razor Pages (Identity UI)
 builder.Services.AddControllersWithViews();
