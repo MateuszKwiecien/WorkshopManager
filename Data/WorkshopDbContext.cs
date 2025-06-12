@@ -1,10 +1,12 @@
 ﻿// Data/WorkshopDbContext.cs
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WorkshopManager.Models;
 
+
 namespace WorkshopManager.Data
 {
-    public class WorkshopDbContext : DbContext
+    public class WorkshopDbContext : IdentityDbContext
     {
         public WorkshopDbContext(DbContextOptions<WorkshopDbContext> options)
             : base(options)
@@ -40,6 +42,14 @@ namespace WorkshopManager.Data
                 .WithMany(u => u.Comments)
                 .HasForeignKey(c => c.CustomerId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<Part>()
+                .Property(p => p.UnitPrice)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<ServiceTask>()
+                .Property(t => t.Price)
+                .HasPrecision(18, 2);
         }
     }
 }

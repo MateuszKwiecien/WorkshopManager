@@ -16,6 +16,9 @@ namespace WorkshopManager.Models
 
         [StringLength(200)]
         public string Status { get; set; } = "Open";
+        
+        public string? MechanicId { get; set; }
+        public string? Description { get; set; }
 
         // Foreign keys
         public int CustomerId { get; set; }

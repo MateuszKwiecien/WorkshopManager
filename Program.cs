@@ -1,5 +1,8 @@
 using WorkshopManager.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using WorkshopManager.Data.Repositories;
+using WorkshopManager.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +11,16 @@ builder.Services.AddControllersWithViews();
 // Dodaj DbContext
 builder.Services.AddDbContext<WorkshopDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<WorkshopDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 var app = builder.Build();
 
@@ -29,5 +42,18 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<WorkshopDbContext>();
+    db.Database.Migrate();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    await IdentityDataInitializer.SeedRolesAsync(scope.ServiceProvider);
+}
+
+
 
 app.Run();
