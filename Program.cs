@@ -1,5 +1,6 @@
 using WorkshopManager.Data;
 using Microsoft.EntityFrameworkCore;
+using WorkshopManager.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,7 @@ builder.Services.AddControllersWithViews();
 // Dodaj DbContext
 builder.Services.AddDbContext<WorkshopDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddHostedService<MigrationService>();
 
 var app = builder.Build();
 

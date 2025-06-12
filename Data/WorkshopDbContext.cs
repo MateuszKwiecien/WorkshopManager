@@ -23,23 +23,31 @@ namespace WorkshopManager.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Przykład konfiguracji: unikaty na rejestracji pojazdu
+            // kaskada z Vehicle → Customer zostaje
+            modelBuilder.Entity<Vehicle>()
+                .HasOne(v => v.Customer)
+                .WithMany(c => c.Vehicles)
+                .HasForeignKey(v => v.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ───── naprawa: blokujemy kaskadę Vehicle → ServiceOrder
+            modelBuilder.Entity<ServiceOrder>()
+                .HasOne(o => o.Vehicle)
+                .WithMany(v => v.ServiceOrders)
+                .HasForeignKey(o => o.VehicleId)
+                .OnDelete(DeleteBehavior.Restrict);   // albo NoAction
+
+            // relacja Customer → ServiceOrder może pozostać kaskadowa
+            modelBuilder.Entity<ServiceOrder>()
+                .HasOne(o => o.Customer)
+                .WithMany(c => c.ServiceOrders)
+                .HasForeignKey(o => o.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // (opcjonalnie) unikat na numer rejestracyjny
             modelBuilder.Entity<Vehicle>()
                 .HasIndex(v => v.RegistrationNumber)
                 .IsUnique();
-
-            // Relacje optional/required
-            modelBuilder.Entity<Comment>()
-                .HasOne(c => c.ServiceOrder)
-                .WithMany(o => o.Comments)
-                .HasForeignKey(c => c.ServiceOrderId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Comment>()
-                .HasOne(c => c.Customer)
-                .WithMany(u => u.Comments)
-                .HasForeignKey(c => c.CustomerId)
-                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
