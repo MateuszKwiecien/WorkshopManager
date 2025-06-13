@@ -24,7 +24,8 @@ namespace WorkshopManager.Mappers
                     s.RegistrationNumber,
                     s.Year,
                     s.CustomerId,
-                    s.Customer != null ? s.Customer.FullName : "gowno"  // CustomerName
+                    s.Customer != null ? s.Customer.FullName : "gowno",// CustomerName
+                    s.ImagePath ?? string.Empty
                 ));
             cfg.NewConfig<VehicleDto, Vehicle>();    // odwrotny kierunek bez zmian
 

@@ -1,4 +1,6 @@
 // Controllers/VehiclesController.cs
+
+using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -36,41 +38,71 @@ public class VehiclesController : Controller
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(VehicleDto dto)
+public async Task<IActionResult> Create(VehicleDto dto, IFormFile? photo)
+{
+    // 1. próbujemy znaleźć klienta po imieniu
+    if (dto.CustomerId == 0 && !string.IsNullOrWhiteSpace(dto.CustomerName))
     {
-        // 1. próbujemy znaleźć klienta po imieniu
-        if (dto.CustomerId == 0 && !string.IsNullOrWhiteSpace(dto.CustomerName))
-        {
-            var match = (await _customers.GetAllAsync(null))
-                .Where(c => c.FullName.Equals(dto.CustomerName.Trim(),
-                    StringComparison.OrdinalIgnoreCase))
-                .ToList();
+        var match = (await _customers.GetAllAsync(null))
+            .Where(c => c.FullName.Equals(dto.CustomerName.Trim(),
+                StringComparison.OrdinalIgnoreCase))
+            .ToList();
 
-            if (match.Count == 1)
+        if (match.Count == 1)
+        {
+            dto = dto with
             {
-                dto = dto with
-                {
-                    CustomerId   = match[0].Id,
-                    CustomerName = match[0].FullName
-                };
-            }
-            else
-            {
-                ModelState.AddModelError("CustomerName",
-                    match.Count == 0
-                        ? "Nie znaleziono klienta o podanym imieniu."
-                        : "Istnieje więcej niż jeden klient o tej nazwie – podaj dokładniej.");
-            }
+                CustomerId = match[0].Id,
+                CustomerName = match[0].FullName
+            };
+        }
+        else
+        {
+            ModelState.AddModelError("CustomerName",
+                match.Count == 0
+                    ? "Nie znaleziono klienta o podanym imieniu."
+                    : "Istnieje więcej niż jeden klient o tej nazwie – podaj dokładniej.");
+        }
+    }
+
+    // 2. walidacja
+    if (!ModelState.IsValid)
+    {
+        await FillCustomerSelectListAsync();
+        return View(dto);
+    }
+
+    /* ▸  Handle file upload  */
+    if (photo is { Length: > 0 })
+    {
+        var validTypes = new[] { "image/jpeg", "image/png", "image/webp" };
+        if (!validTypes.Contains(photo.ContentType))
+            ModelState.AddModelError("ImagePath", "Dozwolone formaty: JPG, PNG, WEBP");
+
+        if (photo.Length > 5 * 1024 * 1024)        // 5 MB
+            ModelState.AddModelError("ImagePath", "Maksymalny rozmiar to 5 MB");
+
+        if (!ModelState.IsValid)
+        {
+            await FillCustomerSelectListAsync();
+            return View(dto);
         }
 
-        // 2. walidacja
-        if (!ModelState.IsValid)
-            return View(dto);
+        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(photo.FileName)}";
+        var savePath = Path.Combine("wwwroot", "uploads", fileName);
 
-        // 3. zapis
-        await _vehicles.AddAsync(dto);
-        return RedirectToAction(nameof(Index));
+        Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
+        await using var stream = System.IO.File.Create(savePath);
+        await photo.CopyToAsync(stream);
+
+        dto = dto with { ImagePath = $"/uploads/{fileName}" };
+        Debug.WriteLine($"New image path: {dto.ImagePath}");
     }
+
+    // 3. zapis
+    await _vehicles.AddAsync(dto);
+    return RedirectToAction(nameof(Index));
+}
 
 
 
@@ -87,7 +119,7 @@ public class VehiclesController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, VehicleDto dto)
+    public async Task<IActionResult> Edit(int id, VehicleDto dto, IFormFile? photo)
     {
         if (id != dto.Id) return BadRequest();
 
@@ -95,6 +127,33 @@ public class VehiclesController : Controller
         {
             await FillCustomerSelectListAsync(dto.CustomerId);
             return View(dto);
+        }
+
+        /* ▸  Handle file upload  */
+        if (photo is { Length: > 0 })
+        {
+            var validTypes = new[] { "image/jpeg", "image/png", "image/webp" };
+            if (!validTypes.Contains(photo.ContentType))
+                ModelState.AddModelError("ImagePath", "Dozwolone formaty: JPG, PNG, WEBP");
+
+            if (photo.Length > 5 * 1024 * 1024)        // 5 MB
+                ModelState.AddModelError("ImagePath", "Maksymalny rozmiar to 5 MB");
+
+            if (!ModelState.IsValid)
+            {
+                await FillCustomerSelectListAsync(dto.CustomerId);
+                return View(dto);
+            }
+
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(photo.FileName)}";
+            var savePath = Path.Combine("wwwroot", "uploads", fileName);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
+            await using var stream = System.IO.File.Create(savePath);
+            await photo.CopyToAsync(stream);
+
+            dto = dto with { ImagePath = $"/uploads/{fileName}" };
+            Debug.WriteLine($"New image path: {dto.ImagePath}");
         }
 
         var ok = await _vehicles.UpdateAsync(id, dto);

@@ -7,4 +7,5 @@ public record VehicleDto(
     string RegistrationNumber,
     int    Year,
     int    CustomerId,
-    string CustomerName);
+    string CustomerName,
+    string? ImagePath);

@@ -46,6 +46,10 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.CustomerName)
         </dd>
+        @if (!string.IsNullOrEmpty(Model.ImagePath))
+        {
+            <img src="@Model.ImagePath" class="mb-3" style="max-width:300px" />
+        }
     </dl>
 </div>
 <div>

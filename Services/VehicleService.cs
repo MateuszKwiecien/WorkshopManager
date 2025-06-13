@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using WorkshopManager.DTOs;
@@ -25,6 +26,17 @@ public class VehicleService : IVehicleService
 
         if (customerId != 0)
             query = query.Where(v => v.CustomerId == customerId);
+        
+        var rawVehicles = await query.ToListAsync();
+        foreach (var v in rawVehicles)
+        {
+            Debug.WriteLine("=== RAW DATABASE DATA ===");
+            Debug.WriteLine($"Vehicle ID: {v.Id}");
+            Debug.WriteLine($"Image Path from DB: '{v.ImagePath}'");
+            Debug.WriteLine($"Image Path is null: {v.ImagePath == null}");
+            Debug.WriteLine($"Customer Name: '{v.Customer?.FullName}'");
+            Debug.WriteLine("=======================");
+        }
 
         var dtoList = await query
             .Select(v => new VehicleDto(
@@ -34,9 +46,19 @@ public class VehicleService : IVehicleService
                 v.RegistrationNumber,
                 v.Year,
                 v.CustomerId,
-                v.Customer.FullName                // ← imię trafia bez Mapstera
+                v.Customer.FullName,                // ← imię trafia bez Mapstera
+                v.ImagePath ?? string.Empty
             ))
             .ToListAsync();
+        
+        foreach (var dto in dtoList)
+        {
+            Debug.WriteLine("=== DTO DATA ===");
+            Debug.WriteLine($"DTO ID: {dto.Id}");
+            Debug.WriteLine($"DTO Image Path: '{dto.ImagePath}'");
+            Debug.WriteLine($"DTO Image is empty: {string.IsNullOrEmpty(dto.ImagePath)}");
+            Debug.WriteLine("================");
+        }
 
         return dtoList;
     }
@@ -52,12 +74,13 @@ public class VehicleService : IVehicleService
         return v is null ? null
             : new VehicleDto(v.Id, v.Make, v.Model,
                 v.RegistrationNumber, v.Year,
-                v.CustomerId, v.Customer.FullName);
+                v.CustomerId, v.Customer.FullName, v.ImagePath);
     }
 
     public async Task<int> AddAsync(VehicleDto dto)
     {
         var e = _map.Map<Vehicle>(dto);
+        Debug.WriteLine($"Adding vehicle - Image path: '{e.ImagePath}'");
         await _repo.AddAsync(e);
         await _repo.SaveAsync();
         return e.Id;
@@ -65,9 +88,11 @@ public class VehicleService : IVehicleService
 
     public async Task<bool> UpdateAsync(int id, VehicleDto dto)
     {
+        Debug.WriteLine($"Updating vehicle - Incoming DTO image path: '{dto.ImagePath}'");
         var e = await _repo.GetByIdAsync(id);
         if (e is null) return false;
         _map.Map(dto, e);
+        Debug.WriteLine($"After mapping - Entity image path: '{e.ImagePath}'");
         _repo.Update(e);
         await _repo.SaveAsync();
         return true;

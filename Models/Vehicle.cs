@@ -25,5 +25,7 @@ namespace WorkshopManager.Models
 
         // Navigation
         public ICollection<ServiceOrder> ServiceOrders { get; set; } = new List<ServiceOrder>();
+        
+        public string? ImagePath { get; set; }      
     }
 }
