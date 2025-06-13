@@ -57,10 +57,13 @@ namespace WorkshopManager.Controllers
         {
             if (!ModelState.IsValid)
             {
-                await FillSelectListsAsync(dto.CustomerId);
+                await FillSelectListsAsync();
                 return View(dto);
             }
 
+            // Set initial status
+            dto = dto with { Status = "New", CreatedAt = DateTime.UtcNow };
+    
             await _orders.AddAsync(dto);
             return RedirectToAction(nameof(Index));
         }
@@ -72,7 +75,7 @@ namespace WorkshopManager.Controllers
             var order = await _orders.GetAsync(id);
             if (order is null) return NotFound();
 
-            await FillSelectListsAsync(order.CustomerId, order.VehicleId);
+            await FillSelectListsAsync();
             return View(order);
         }
 
@@ -83,7 +86,7 @@ namespace WorkshopManager.Controllers
 
             if (!ModelState.IsValid)
             {
-                await FillSelectListsAsync(dto.CustomerId, dto.VehicleId);
+                await FillSelectListsAsync();
                 return View(dto);
             }
 
@@ -137,15 +140,13 @@ namespace WorkshopManager.Controllers
         }
 
         /*──────────────────────  HELPER  ─────────────────────*/
-        private async Task FillSelectListsAsync(int selCustomer = 0, int selVehicle = 0)
+        private async Task FillSelectListsAsync()
         {
             var customers = await _customers.GetAllAsync(null);
-            ViewBag.CustomerList =
-                new SelectList(customers, "Id", "FullName", selCustomer);
+            ViewBag.CustomerList = new SelectList(customers, "Id", "FullName");
 
-            var vehicles = await _vehicles.GetAllAsync(selCustomer);
-            ViewBag.VehicleList =
-                new SelectList(vehicles, "Id", "RegistrationNumber", selVehicle);
+            var vehicles = await _vehicles.GetAllAsync(0); // 0 means all vehicles
+            ViewBag.VehicleList = new SelectList(vehicles, "Id", "RegistrationNumber");
         }
     }
 }

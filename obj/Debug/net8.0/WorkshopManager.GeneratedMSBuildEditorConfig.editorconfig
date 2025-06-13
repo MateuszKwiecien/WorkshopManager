@@ -17,115 +17,117 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = WorkshopManager
 build_property.RootNamespace = WorkshopManager
-build_property.ProjectDir = C:\Users\Mateo\RiderProjects\WorkshopManager\WorkshopManager\
+build_property.ProjectDir = C:\Users\fasol\Documents\laby NET\WorkshopManager\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\Mateo\RiderProjects\WorkshopManager\WorkshopManager
+build_property.MSBuildProjectDirectory = C:\Users\fasol\Documents\laby NET\WorkshopManager
 build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Account/Login.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Account/Register.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Account/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Customers/Create.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Customers/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJzXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Customers/Details.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Customers/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJzXERldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Customers/Edit.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Customers/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJzXEVkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Customers/Index.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Customers/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Home/Index.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Home/Privacy.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/ServiceOrders/Create.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/ServiceOrders/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZU9yZGVyc1xDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/ServiceOrders/Delete.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/ServiceOrders/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZU9yZGVyc1xEZWxldGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/ServiceOrders/Details.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/ServiceOrders/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZU9yZGVyc1xEZXRhaWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/ServiceOrders/Edit.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/ServiceOrders/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZU9yZGVyc1xFZGl0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/ServiceOrders/Index.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/ServiceOrders/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZU9yZGVyc1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Shared/Error.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Shared/_LoginPartial.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Shared/_LoginPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Mb2dpblBhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Shared/_TaskRow.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Shared/_TaskRow.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9UYXNrUm93LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Shared/_UsedPartRow.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Shared/_UsedPartRow.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Vc2VkUGFydFJvdy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Vehicles/Create.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Vehicles/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVmVoaWNsZXNcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Vehicles/Delete.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Vehicles/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVmVoaWNsZXNcRGVsZXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Vehicles/Details.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Vehicles/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVmVoaWNsZXNcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Vehicles/Edit.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Vehicles/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVmVoaWNsZXNcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Vehicles/Index.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Vehicles/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVmVoaWNsZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/_ViewImports.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/_ViewStart.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Mateo/RiderProjects/WorkshopManager/WorkshopManager/Views/Shared/_Layout.cshtml]
+[C:/Users/fasol/Documents/laby NET/WorkshopManager/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-15wgf40x71

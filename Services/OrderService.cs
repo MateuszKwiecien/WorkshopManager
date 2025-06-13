@@ -18,9 +18,27 @@ public class OrderService : IOrderService
 
     public async Task<IEnumerable<ServiceOrderDto>> GetAllAsync(string? status)
     {
-        var list = await _repo.ListAsync(o =>
-            string.IsNullOrEmpty(status) || o.Status == status);
-        return _map.Map<IEnumerable<ServiceOrderDto>>(list);
+        IQueryable<ServiceOrder> query = _repo.Query()
+            .Include(o => o.Customer)
+            .Include(o => o.Vehicle);
+
+        if (!string.IsNullOrEmpty(status))
+            query = query.Where(o => o.Status == status);
+
+        var dtoList = await query
+            .Select(o => new ServiceOrderDto(
+                o.Id,
+                o.CreatedAt,
+                o.CompletedAt,
+                o.Status,
+                o.CustomerId,
+                o.Customer.FullName,
+                o.VehicleId,
+                o.Vehicle.RegistrationNumber
+            ))
+            .ToListAsync();
+
+        return dtoList;
     }
 
     public async Task<ServiceOrderDto?> GetAsync(int id)

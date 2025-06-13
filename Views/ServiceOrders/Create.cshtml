@@ -27,24 +27,21 @@
                 <input asp-for="Status" class="form-control" />
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CustomerId" class="control-label"></label>
-                <input asp-for="CustomerId" class="form-control" />
-                <span asp-validation-for="CustomerId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CustomerName" class="control-label"></label>
-                <input asp-for="CustomerName" class="form-control" />
+            <div class="col-12">
+                <label asp-for="CustomerName" class="form-label">Klient</label>
+                <select asp-items="ViewBag.CustomerList" class="form-select"
+                        id="CustomerId" name="CustomerId">
+                    <option value="">-- Wybierz klienta --</option>
+                </select>
                 <span asp-validation-for="CustomerName" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="VehicleId" class="control-label"></label>
-                <input asp-for="VehicleId" class="form-control" />
-                <span asp-validation-for="VehicleId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="VehicleReg" class="control-label"></label>
-                <input asp-for="VehicleReg" class="form-control" />
+
+            <div class="col-12">
+                <label asp-for="VehicleReg" class="form-label">Pojazd</label>
+                <select asp-items="ViewBag.VehicleList" class="form-select"
+                        id="VehicleId" name="VehicleId">
+                    <option value="">-- Wybierz pojazd --</option>
+                </select>
                 <span asp-validation-for="VehicleReg" class="text-danger"></span>
             </div>
             <div class="form-group">
