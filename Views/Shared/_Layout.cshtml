@@ -33,7 +33,20 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Home" asp-action="Privacy">Privacy</a>
                     </li>
-                    <!-- tu możesz dodać kolejne linki -->
+
+                    @* linki widoczne tylko po zalogowaniu *@
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Customers" asp-action="Index">Klienci</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Vehicles" asp-action="Index">Pojazdy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="ServiceOrders" asp-action="Index">Zlecenia</a>
+                        </li>
+                    }
                 </ul>
 
                 <!-- prawa część: logowanie / wylogowanie -->

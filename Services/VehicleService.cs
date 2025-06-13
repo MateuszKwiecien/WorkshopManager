@@ -13,17 +13,31 @@ public class VehicleService : IVehicleService
 
     public VehicleService(IRepository<Vehicle> repo, IMapper map)
     {
-        _repo = repo; _map = map;
+        _repo = repo;
+        _map  = map;
     }
 
+    /*──────── LISTA ────────*/
     public async Task<IEnumerable<VehicleDto>> GetAllAsync(int customerId)
     {
-        var list = await _repo.ListAsync(v => v.CustomerId == customerId || customerId == 0);
-        return _map.Map<IEnumerable<VehicleDto>>(list);
+        IQueryable<Vehicle> query = _repo.Query()
+            .Include(v => v.Customer);   // ← DOŁĄCZ
+
+        if (customerId != 0)
+            query = query.Where(v => v.CustomerId == customerId);
+
+        return _map.Map<IEnumerable<VehicleDto>>(await query.ToListAsync());
     }
 
+    /*──────── SZCZEGÓŁ ────*/
     public async Task<VehicleDto?> GetAsync(int id)
-        => _map.Map<VehicleDto?>(await _repo.GetByIdAsync(id));
+    {
+        var vehicle = await _repo.Query()          // ← TEŻ przez Query()
+            .Include(v => v.Customer)
+            .FirstOrDefaultAsync(v => v.Id == id);
+
+        return _map.Map<VehicleDto?>(vehicle);
+    }
 
     public async Task<int> AddAsync(VehicleDto dto)
     {

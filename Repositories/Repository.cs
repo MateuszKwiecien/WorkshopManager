@@ -15,7 +15,8 @@ namespace WorkshopManager.Repositories
             _db  = db;
             _set = db.Set<T>();
         }
-
+        
+        public IQueryable<T> Query() => _set.AsQueryable();
         public async Task<T?> GetByIdAsync(int id) => await _set.FindAsync(id);
 
         public async Task<IReadOnlyList<T>> ListAsync(Expression<Func<T, bool>>? p = null) =>

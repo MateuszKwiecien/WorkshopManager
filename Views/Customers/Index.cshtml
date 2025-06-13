@@ -1,0 +1,28 @@
+﻿@model IEnumerable<WorkshopManager.DTOs.CustomerDto>
+@{
+    ViewData["Title"] = "Klienci";
+}
+<h2>Klienci</h2>
+
+<a asp-action="Create" class="btn btn-primary mb-3">Nowy klient</a>
+
+<table class="table table-striped">
+    <thead>
+    <tr><th>Imię i nazwisko</th><th>Telefon</th><th>Email</th><th></th></tr>
+    </thead>
+    <tbody>
+    @foreach (var c in Model)
+    {
+        <tr>
+            <td>@c.FullName</td>
+            <td>@c.PhoneNumber</td>
+            <td>@c.Email</td>
+            <td>
+                <a asp-action="Edit"    asp-route-id="@c.Id">Edytuj</a> |
+                <a asp-action="Details" asp-route-id="@c.Id">Szczegóły</a> |
+                <a asp-action="Delete"  asp-route-id="@c.Id">Usuń</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

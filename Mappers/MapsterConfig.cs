@@ -1,4 +1,5 @@
-﻿using Mapster;
+﻿// Mappers/MapsterConfig.cs
+using Mapster;
 using WorkshopManager.DTOs;
 using WorkshopManager.Models;
 
@@ -6,22 +7,42 @@ namespace WorkshopManager.Mappers
 {
     public class MapsterConfig : IRegister
     {
-        public void Register(TypeAdapterConfig c)
+        public void Register(TypeAdapterConfig cfg)
         {
-            c.NewConfig<Customer,     CustomerDto>();
-            c.NewConfig<CustomerDto, Customer>();
-            // Vehicle ↔ VehicleDto
-            c.NewConfig<Vehicle,     VehicleDto>()
+            /*──────────── Customer ↔ CustomerDto ────────────*/
+            cfg.NewConfig<Customer,     CustomerDto>();
+            cfg.NewConfig<CustomerDto,  Customer>();
+
+            /*──────────── Vehicle ↔ VehicleDto ──────────────*/
+            cfg.NewConfig<Vehicle,      VehicleDto>()
                 .Map(d => d.CustomerName, s => s.Customer.FullName);
 
-            c.NewConfig<VehicleDto,  Vehicle>();
+            cfg.NewConfig<VehicleDto,   Vehicle>();
 
-            // ServiceOrder ↔ ServiceOrderDto
-            c.NewConfig<ServiceOrder, ServiceOrderDto>()
+            /*──────────── ServiceOrder ↔ ServiceOrderDto ────*/
+            cfg.NewConfig<ServiceOrder, ServiceOrderDto>()
                 .Map(d => d.CustomerName, s => s.Customer.FullName)
                 .Map(d => d.VehicleReg,   s => s.Vehicle.RegistrationNumber);
 
-            c.NewConfig<ServiceOrderDto, ServiceOrder>();
+            cfg.NewConfig<ServiceOrderDto, ServiceOrder>();
+
+            /*──────────── ServiceTask ↔ ServiceTaskDto ──────*/
+            // ServiceTask ↔ ServiceTaskDto
+            cfg.NewConfig<ServiceTask, ServiceTaskDto>()
+                .Map(d => d.OrderId, s => s.ServiceOrderId);
+
+            cfg.NewConfig<ServiceTaskDto, ServiceTask>()
+                .Map(d => d.ServiceOrderId, s => s.OrderId);
+
+
+            // UsedPart ↔ UsedPartDto
+            cfg.NewConfig<UsedPart, UsedPartDto>()
+                .Map(d => d.PartName,  s => s.Part.Name)
+                .Map(d => d.UnitPrice, s => s.Part.UnitPrice)
+                .Map(d => d.OrderId,   s => s.ServiceOrderId);
+
+            cfg.NewConfig<UsedPartDto, UsedPart>()
+                .Map(d => d.ServiceOrderId, s => s.OrderId);
         }
     }
 }

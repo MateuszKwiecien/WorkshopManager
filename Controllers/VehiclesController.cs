@@ -35,19 +35,44 @@ public class VehiclesController : Controller
         return View();
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(VehicleDto dto)
     {
-        if (!ModelState.IsValid)
+        // 1. próbujemy znaleźć klienta po imieniu
+        if (dto.CustomerId == 0 && !string.IsNullOrWhiteSpace(dto.CustomerName))
         {
-            await FillCustomerSelectListAsync(dto.CustomerId);
-            return View(dto);
+            var match = (await _customers.GetAllAsync(null))
+                .Where(c => c.FullName.Equals(dto.CustomerName.Trim(),
+                    StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (match.Count == 1)
+            {
+                dto = dto with
+                {
+                    CustomerId   = match[0].Id,
+                    CustomerName = match[0].FullName
+                };
+            }
+            else
+            {
+                ModelState.AddModelError("CustomerName",
+                    match.Count == 0
+                        ? "Nie znaleziono klienta o podanym imieniu."
+                        : "Istnieje więcej niż jeden klient o tej nazwie – podaj dokładniej.");
+            }
         }
 
+        // 2. walidacja
+        if (!ModelState.IsValid)
+            return View(dto);
+
+        // 3. zapis
         await _vehicles.AddAsync(dto);
         return RedirectToAction(nameof(Index));
     }
+
+
 
     /*──────────────────────  EDIT  ───────────────────────*/
     [HttpGet]

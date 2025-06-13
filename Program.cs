@@ -42,6 +42,10 @@ builder.Services.AddRazorPages();
 builder.Services.AddHostedService<MigrationService>();
 builder.Services.AddHostedService<IdentitySeeder>();
 
+builder.Services.AddScoped<ITaskService,      TaskService>();
+builder.Services.AddScoped<IUsedPartService,  UsedPartService>();
+
+
 // ░░░ Middleware ░░░─────────────────────────────────────────────────────────
 
 var app = builder.Build();
@@ -57,7 +61,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication();             // musi być przed Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 // trasy MVC
