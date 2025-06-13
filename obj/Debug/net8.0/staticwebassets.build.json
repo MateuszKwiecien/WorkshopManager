@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "V+wa9SAC270YTXR+pnuT/RCW+rOGcIDR2nIWNUYhQFI=",
+  "Hash": "DxpnUOF6f33P8gkucr+4XWmxoZQaKmpcFmT6/aFdyKs=",
   "Source": "WorkshopManager",
   "BasePath": "_content/WorkshopManager",
   "Mode": "Default",
@@ -2333,6 +2333,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\lib\\jquery\\LICENSE.txt"
+    },
+    {
+      "Identity": "C:\\Users\\Mateo\\RiderProjects\\WorkshopManager\\WorkshopManager\\wwwroot\\uploads\\96197c4d-15dd-40c4-9f8b-d2b8dad860e0.jpg",
+      "SourceId": "WorkshopManager",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Mateo\\RiderProjects\\WorkshopManager\\WorkshopManager\\wwwroot\\",
+      "BasePath": "_content/WorkshopManager",
+      "RelativePath": "uploads/96197c4d-15dd-40c4-9f8b-d2b8dad860e0.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\96197c4d-15dd-40c4-9f8b-d2b8dad860e0.jpg"
     }
   ]
 }

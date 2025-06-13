@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using WorkshopManager.Models;
 using WorkshopManager.ViewModels;
 
@@ -7,35 +8,59 @@ namespace WorkshopManager.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userMgr;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleMgr;
 
-        public AccountController(UserManager<ApplicationUser> user, SignInManager<ApplicationUser> signIn)
+        public AccountController(UserManager<ApplicationUser>  userMgr,
+            SignInManager<ApplicationUser> signInMgr,
+            RoleManager<IdentityRole>      roleMgr)
         {
-            _userManager  = user;
-            _signInManager = signIn;
+            _userMgr  = userMgr;
+            _signInManager = signInMgr;
+            _roleMgr   = roleMgr;
         }
 
+/*──── GET: /Account/Register ────*/
         [HttpGet]
-        public IActionResult Register() => View();
+        public IActionResult Register()
+        {
+            ViewBag.RoleList = new SelectList(new[] { "Admin", "Mechanik", "Recepcjonista" });
+            return View();
+        }
 
-        [HttpPost]
+/*──── POST: /Account/Register ────*/
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterVm vm)
         {
-            if (!ModelState.IsValid) return View(vm);
+            if (!ModelState.IsValid)
+            {
+                ViewBag.RoleList = new SelectList(new[] { "Admin", "Mechanik", "Recepcjonista" }, vm.Role);
+                return View(vm);
+            }
+
+            // upewnij się, że podana rola istnieje
+            if (!await _roleMgr.RoleExistsAsync(vm.Role))
+            {
+                ModelState.AddModelError("Role", "Wybrana rola nie istnieje.");
+                ViewBag.RoleList = new SelectList(new[] { "Admin", "Mechanik", "Recepcjonista" }, vm.Role);
+                return View(vm);
+            }
 
             var user = new ApplicationUser { UserName = vm.Email, Email = vm.Email };
-            var result = await _userManager.CreateAsync(user, vm.Password);
+            var result = await _userMgr.CreateAsync(user, vm.Password);
 
             if (result.Succeeded)
             {
-                // domyślnie przypisz Recepcjonistę – zmień wg potrzeb
-                await _userManager.AddToRoleAsync(user, "Recepcjonista");
-                await _signInManager.SignInAsync(user, false);
+                await _userMgr.AddToRoleAsync(user, vm.Role);          // ← przypisz rolę
+                await _signInManager.SignInAsync(user, isPersistent: false);
                 return RedirectToAction("Index", "Home");
             }
 
-            foreach (var e in result.Errors) ModelState.AddModelError("", e.Description);
+            foreach (var error in result.Errors)
+                ModelState.AddModelError(string.Empty, error.Description);
+
+            ViewBag.RoleList = new SelectList(new[] { "Admin", "Mechanik", "Recepcjonista" }, vm.Role);
             return View(vm);
         }
 
