@@ -67,25 +67,48 @@
 </table>
 
 <!--──────────── FORMULARZ: dodaj istniejące części ────────────-->
-<form asp-action="AddExistingParts" method="post" class="row g-2 mb-3">
+<form asp-action="AddExistingParts" method="post" class="table-responsive mb-3">
     <input type="hidden" name="orderId" value="@Model.Id" />
 
-    <div class="col-md-6">
-        <select name="partIds" multiple size="5"
-                asp-items="@(new SelectList(partsList, "Id", "Name"))"
-                class="form-select">
-        </select>
-    </div>
+    <table class="table table-sm align-middle">
+        <thead class="table-light">
+        <tr>
+            <th style="width:3rem"></th>
+            <th>Nazwa części</th>
+            <th class="text-end" style="width:10rem">Cena&nbsp;szt.</th>
+            <th style="width:7rem">Ilość</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in partsList.Select((part, idx) => new { part, idx }))
+        {
+            <tr>
+                <td class="text-center">
+                    <input type="checkbox"
+                           name="partIds"
+                           value="@item.part.Id" />
+                </td>
+                <td>@item.part.Name</td>
+                <td class="text-end">@item.part.UnitPrice:C</td>
+                <td>
+                    <input type="number"
+                           name="quantities"
+                           value="1"
+                           min="1"
+                           class="form-control form-control-sm" />
+                </td>
+            </tr>
+        }
 
-    <div class="col-md-4 d-grid">
-        <button type="submit" class="btn btn-success">
-            Dodaj zaznaczone części
-        </button>
-    </div>
-    <div class="col-md-2 small align-self-center">
-        <em>(Ctrl / ⌘ + klik = kilka)</em>
-    </div>
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-success">
+        Dodaj zaznaczone części
+    </button>
+    <span class="text-muted ms-2 small">(Ctrl / ⌘ + klik = wiele)&nbsp;</span>
 </form>
+
 
 
 

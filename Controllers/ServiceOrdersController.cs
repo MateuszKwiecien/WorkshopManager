@@ -149,23 +149,28 @@ namespace WorkshopManager.Controllers
             return RedirectToAction(nameof(Details), new { id = dto.OrderId });
         }
         
-        // POST: /ServiceOrders/AddExistingParts
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddExistingParts(int orderId, int[] partIds)
+        public async Task<IActionResult> AddExistingParts(
+            int orderId,
+            int[] partIds,
+            int[] quantities)          // ← NOWY parametr
         {
             if (partIds.Length == 0)
                 return RedirectToAction(nameof(Details), new { id = orderId });
 
+            // pobieramy wszystkie zaznaczone części 1 zapytaniem
             var catalog = await _partsCatalog.GetManyAsync(partIds);
 
-            foreach (var p in catalog)
+            for (int i = 0; i < partIds.Length; i++)
             {
-                // ‼ używamy NAZWANYCH argumentów — kolejność już nie myli
+                var p   = catalog.First(c => c.Id == partIds[i]);
+                var qty = i < quantities.Length ? quantities[i] : 1;
+
                 var dto = new UsedPartDto(
-                    Id:        0,          // EF Core sam nada
-                    OrderId:   orderId,    // FK do ServiceOrders
-                    PartId:    p.Id,       // FK do katalogu Parts
-                    Quantity:  1,
+                    Id:        0,
+                    OrderId:   orderId,
+                    PartId:    p.Id,
+                    Quantity:  qty,
                     UnitPrice: p.UnitPrice,
                     PartName:  p.Name);
 
@@ -174,6 +179,7 @@ namespace WorkshopManager.Controllers
 
             return RedirectToAction(nameof(Details), new { id = orderId });
         }
+
 
 
 
