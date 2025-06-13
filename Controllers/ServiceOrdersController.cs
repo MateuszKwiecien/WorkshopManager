@@ -14,20 +14,23 @@ namespace WorkshopManager.Controllers
         private readonly ICustomerService _customers;
         private readonly IVehicleService  _vehicles;
         private readonly ITaskService     _tasks;
-        private readonly IUsedPartService _parts;
+        private readonly IUsedPartService _usedParts;
+        private readonly IPartService _partsCatalog;   // katalog Parts
 
         public ServiceOrdersController(
-            IOrderService      orders,
-            ICustomerService   customers,
-            IVehicleService    vehicles,
-            ITaskService       tasks,
-            IUsedPartService   parts)
+            IOrderService    orders,
+            ICustomerService customers,
+            IVehicleService  vehicles,
+            ITaskService     tasks,
+            IUsedPartService usedParts,
+            IPartService     partsCatalog)   // ← NOWE
         {
-            _orders    = orders;
-            _customers = customers;
-            _vehicles  = vehicles;
-            _tasks     = tasks;
-            _parts     = parts;
+            _orders       = orders;
+            _customers    = customers;
+            _vehicles     = vehicles;
+            _tasks        = tasks;
+            _usedParts    = usedParts;
+            _partsCatalog = partsCatalog;    // ← NOWE
         }
 
         /*──────────────────────  LISTA  ─────────────────────*/
@@ -142,14 +145,42 @@ namespace WorkshopManager.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> AddPart(UsedPartDto dto)
         {
-            await _parts.AddAsync(dto);
+            await _usedParts.AddAsync(dto);
             return RedirectToAction(nameof(Details), new { id = dto.OrderId });
         }
+        
+        // POST: /ServiceOrders/AddExistingParts
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddExistingParts(int orderId, int[] partIds)
+        {
+            if (partIds.Length == 0)
+                return RedirectToAction(nameof(Details), new { id = orderId });
+
+            var catalog = await _partsCatalog.GetManyAsync(partIds);
+
+            foreach (var p in catalog)
+            {
+                // ‼ używamy NAZWANYCH argumentów — kolejność już nie myli
+                var dto = new UsedPartDto(
+                    Id:        0,          // EF Core sam nada
+                    OrderId:   orderId,    // FK do ServiceOrders
+                    PartId:    p.Id,       // FK do katalogu Parts
+                    Quantity:  1,
+                    UnitPrice: p.UnitPrice,
+                    PartName:  p.Name);
+
+                await _usedParts.AddAsync(dto);
+            }
+
+            return RedirectToAction(nameof(Details), new { id = orderId });
+        }
+
+
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePart(int id, int orderId)
         {
-            await _parts.DeleteAsync(id);
+            await _usedParts.DeleteAsync(id);
             return RedirectToAction(nameof(Details), new { id = orderId });
         }
 

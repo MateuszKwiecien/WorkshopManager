@@ -1,9 +1,9 @@
 ﻿namespace WorkshopManager.DTOs;
 
 public record UsedPartDto(
-    int    Id,
-    int    PartId,
-    string PartName,
-    int    Quantity,
+    int     Id,
+    int     OrderId,
+    int     PartId,
+    int     Quantity,
     decimal UnitPrice,
-    int    OrderId);
+    string  PartName);

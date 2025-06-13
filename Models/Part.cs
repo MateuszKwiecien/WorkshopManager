@@ -13,6 +13,7 @@ namespace WorkshopManager.Models
 
         public string Manufacturer { get; set; }
 
+        [Range(0.01, 999999)]
         public decimal UnitPrice { get; set; }
 
         // Navigation

@@ -48,6 +48,7 @@ builder.Services.AddScoped<IPartService, PartService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 
 
+
 // ░░░ Middleware ░░░─────────────────────────────────────────────────────────
 
 var app = builder.Build();

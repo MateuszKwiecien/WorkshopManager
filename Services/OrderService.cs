@@ -10,10 +10,11 @@ public class OrderService : IOrderService
 {
     private readonly IRepository<ServiceOrder> _repo;
     private readonly IMapper                   _map;
+    private readonly IPartService _partsCatalog;
 
-    public OrderService(IRepository<ServiceOrder> repo, IMapper map)
+    public OrderService(IRepository<ServiceOrder> repo, IMapper map, IPartService partsCatalog)
     {
-        _repo = repo; _map = map;
+        _repo = repo; _map = map; _partsCatalog = partsCatalog;
     }
 
     public async Task<IEnumerable<ServiceOrderDto>> GetAllAsync(string? status)
@@ -71,6 +72,5 @@ public class OrderService : IOrderService
         await _repo.SaveAsync();
         return true;
     }
-    
-    
+
 }

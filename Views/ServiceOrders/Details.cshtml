@@ -66,29 +66,28 @@
     </tfoot>
 </table>
 
-<!--──────────── FORMULARZ: dodaj część ────────────-->
-<form asp-action="AddPart" method="post" class="row g-2 mb-3">
-    <input type="hidden" name="OrderId" value="@Model.Id" />
+<!--──────────── FORMULARZ: dodaj istniejące części ────────────-->
+<form asp-action="AddExistingParts" method="post" class="row g-2 mb-3">
+    <input type="hidden" name="orderId" value="@Model.Id" />
 
-    <div class="col-md-4">
-        <select name="PartId"
+    <div class="col-md-6">
+        <select name="partIds" multiple size="5"
                 asp-items="@(new SelectList(partsList, "Id", "Name"))"
-                class="form-select" required>
-            <option value="" disabled selected>-- wybierz część --</option>
+                class="form-select">
         </select>
     </div>
-    <div class="col-md-2">
-        <input name="Quantity" type="number" min="1" value="1"
-               class="form-control" required />
-    </div>
-    <div class="col-md-2">
-        <input name="UnitPrice" type="number" step="0.01" min="0"
-               class="form-control" placeholder="Cena szt." required />
-    </div>
+
     <div class="col-md-4 d-grid">
-        <button type="submit" class="btn btn-success">Dodaj część</button>
+        <button type="submit" class="btn btn-success">
+            Dodaj zaznaczone części
+        </button>
+    </div>
+    <div class="col-md-2 small align-self-center">
+        <em>(Ctrl / ⌘ + klik = kilka)</em>
     </div>
 </form>
+
+
 
 <h4>Części</h4>
 <table class="table table-striped">

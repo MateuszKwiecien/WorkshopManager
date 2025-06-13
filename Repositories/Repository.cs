@@ -27,5 +27,11 @@ namespace WorkshopManager.Repositories
         public void  Update(T e) => _set.Update(e);
         public void  Delete(T e) => _set.Remove(e);
         public Task<int> SaveAsync() => _db.SaveChangesAsync();
+        
+        public async Task<T> GetAsync(int id)
+        {
+            // jeśli klucz główny to pojedynczy int → FindAsync jest najprostsze
+            return await _db.Set<T>().FindAsync(id);
+        }
     }
 }

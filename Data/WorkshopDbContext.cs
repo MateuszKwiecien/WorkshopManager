@@ -26,6 +26,10 @@ namespace WorkshopManager.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);   // © IdentityDbContext
+            
+            modelBuilder.Entity<UsedPart>()
+                .Property(u => u.UnitPrice)
+                .HasColumnType("decimal(18,2)");
 
             // kaskada Vehicle → Customer zostaje
             modelBuilder.Entity<Vehicle>()
@@ -52,6 +56,12 @@ namespace WorkshopManager.Data
             modelBuilder.Entity<Vehicle>()
                 .HasIndex(v => v.RegistrationNumber)
                 .IsUnique();
+            
+            modelBuilder.Entity<Part>()
+                .Property(p => p.UnitPrice)
+                .HasColumnType("decimal(18,2)")
+                .HasDefaultValue(0.01m);
+
         }
     public DbSet<WorkshopManager.DTOs.ServiceOrderDto> ServiceOrderDto { get; set; } = default!;
     public DbSet<WorkshopManager.DTOs.VehicleDto> VehicleDto { get; set; } = default!;

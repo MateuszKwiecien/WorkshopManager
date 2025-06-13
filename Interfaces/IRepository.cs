@@ -11,5 +11,6 @@ namespace WorkshopManager.Interfaces
         void Update(T entity);
         void Delete(T entity);
         Task<int> SaveAsync();
+        Task<T> GetAsync(int dtoPartId);
     }
 }
