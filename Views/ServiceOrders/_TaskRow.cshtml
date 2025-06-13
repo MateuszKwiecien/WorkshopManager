@@ -1,0 +1,22 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model WorkshopManager.DTOs.ServiceTaskDto
+
+<tr>
+    <td>@Model.Description</td>
+    <td class="text-end">@Model.Price:C</td>
+    <td>
+        <form asp-action="DeleteTask"
+              asp-route-id="@Model.Id"
+              asp-route-orderId="@Model.OrderId"
+        method="post" class="d-inline">
+
+        @Html.AntiForgeryToken()
+
+        <button type="submit"
+                class="btn btn-sm btn-link"
+                title="Usuń zadanie">
+            🗑️
+        </button>
+        </form>
+    </td>
+</tr>

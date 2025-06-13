@@ -1,0 +1,24 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model WorkshopManager.DTOs.UsedPartDto
+
+<tr>
+    <td>@Model.PartName</td>
+
+    <td class="text-end">@Model.Quantity</td>
+    <td class="text-end">@Model.UnitPrice:C</td>
+    <td class="text-end">@(@Model.Quantity * @Model.UnitPrice):C</td>
+
+    <!-- przycisk usuń -->
+    <td class="text-end">
+        <form asp-action="DeletePart"
+              asp-route-id="@Model.Id"
+              asp-route-orderId="@Model.OrderId"
+              method="post" class="d-inline">
+            <button type="submit"
+                    class="btn btn-sm btn-link"
+                    title="Usuń część">
+                🗑️
+            </button>
+        </form>
+    </td>
+</tr>

@@ -1,0 +1,20 @@
+﻿@model WorkshopManager.DTOs.PartDto
+@{
+    ViewData["Title"] = "Szczegóły części";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-borderless w-auto">
+    <tr>
+        <th>Nazwa:</th>
+        <td>@Model.Name</td>
+    </tr>
+    <tr>
+        <th>Cena:</th>
+        <td>@Model.UnitPrice:C</td>
+    </tr>
+</table>
+
+<a asp-action="Edit"   asp-route-id="@Model.Id" class="btn btn-primary">Edytuj</a>
+<a asp-action="Index"  class="btn btn-secondary">← Powrót</a>

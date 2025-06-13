@@ -1,0 +1,45 @@
+@model IEnumerable<WorkshopManager.DTOs.ServiceOrderDto>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<h1>Zlecenia serwisowe</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nowe zlecenie</a>
+</p>
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Data utworzenia</th>
+        <th>Data zakończenia</th>
+        <th>Status</th>
+        <th>Klient</th>
+        <th>Pojazd</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model) {
+        <tr>
+            <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
+            <td>@Html.DisplayFor(modelItem => item.CompletedAt)</td>
+            <td>@Html.DisplayFor(modelItem => item.Status)</td>
+            <td>@item.CustomerName</td>
+            <td>@item.VehicleReg</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edytuj</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Szczegóły</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Usuń</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

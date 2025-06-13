@@ -1,0 +1,33 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<WorkshopManager.DTOs.PartDto>
+
+@{
+    ViewData["Title"] = "Katalog części";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<a asp-action="Create" class="btn btn-primary mb-3">Nowa część</a>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Nazwa</th>
+        <th class="text-end">Cena</th>
+        <th style="width:110px;"></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var p in Model)
+    {
+        <tr>
+            <td>@p.Name</td>
+            <td class="text-end">@p.UnitPrice:C</td>
+            <td class="text-end">
+                <a asp-action="Edit"   asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary">Edytuj</a>
+                <a asp-action="Delete" asp-route-id="@p.Id" class="btn btn-sm btn-outline-danger">Usuń</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
