@@ -1,0 +1,87 @@
+﻿@model IEnumerable<WorkshopManager.DTOs.ReportRowDto>
+@{
+    ViewData["Title"] = "Raporty";
+}
+
+<h3>Raport kosztów</h3>
+
+<form asp-action="Index" method="get" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <select name="customerId" asp-items="ViewBag.CustomerList"
+                class="form-select">
+            <option value="">-- wszyscy klienci --</option>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <select name="vehicleId" asp-items="ViewBag.VehicleList"
+                class="form-select">
+            <option value="">-- wszystkie pojazdy --</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <select name="year" asp-items="ViewBag.Years" class="form-select">
+            <option value="">rok</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <select name="month" asp-items="ViewBag.Months" class="form-select">
+            <option value="">miesiąc</option>
+        </select>
+    </div>
+
+    <div class="col-md-2 d-grid">
+        <button class="btn btn-primary">Filtruj</button>
+    </div>
+</form>
+
+@if (Model.Any())
+{
+    <form asp-action="ExportPdf" method="post">
+        @* zachowujemy filtry w hidden inputach *@
+        <input type="hidden" name="customerId" value="@Context.Request.Query["customerId"]" />
+        <input type="hidden" name="vehicleId"  value="@Context.Request.Query["vehicleId"]" />
+        <input type="hidden" name="year"       value="@Context.Request.Query["year"]" />
+        <input type="hidden" name="month"      value="@Context.Request.Query["month"]" />
+
+        <button class="btn btn-sm btn-outline-secondary mb-2">Eksportuj PDF</button>
+    </form>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Data</th><th>Klient</th><th>Pojazd</th>
+            <th class="text-end">Roboc.</th>
+            <th class="text-end">Części</th>
+            <th class="text-end">Razem</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.Date:yyyy-MM-dd</td>
+                <td>@r.Customer</td>
+                <td>@r.Vehicle</td>
+                <td class="text-end">@r.Labor:C</td>
+                <td class="text-end">@r.Parts:C</td>
+                <td class="text-end">@r.Total:C</td>
+            </tr>
+        }
+        </tbody>
+        <tfoot>
+        <tr class="table-secondary">
+            <th colspan="3" class="text-end">Suma:</th>
+            <th class="text-end">@Model.Sum(r => r.Labor):C</th>
+            <th class="text-end">@Model.Sum(r => r.Parts):C</th>
+            <th class="text-end">@Model.Sum(r => r.Total):C</th>
+        </tr>
+        </tfoot>
+    </table>
+}
+else
+{
+    <p class="text-muted">Brak danych dla wybranego filtra.</p>
+}

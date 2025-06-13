@@ -2,12 +2,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Mapster;                              // ← Mapster DI
 using WorkshopManager.Data;
+using WorkshopManager.DTOs;
 using WorkshopManager.Models;
 using WorkshopManager.Services;
 using WorkshopManager.Interfaces;
 using WorkshopManager.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
 // ░░░ Usługi ░░░─────────────────────────────────────────────────────────────
 
@@ -46,6 +48,8 @@ builder.Services.AddScoped<ITaskService,      TaskService>();
 builder.Services.AddScoped<IUsedPartService,  UsedPartService>();
 builder.Services.AddScoped<IPartService, PartService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+
 
 
 
