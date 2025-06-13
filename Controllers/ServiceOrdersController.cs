@@ -7,21 +7,21 @@ using WorkshopManager.Interfaces;
 
 namespace WorkshopManager.Controllers
 {
-    [Authorize]   // dostęp tylko dla zalogowanych
+    [Authorize]                                     // dostęp tylko dla zalogowanych
     public class ServiceOrdersController : Controller
     {
-        private readonly IOrderService      _orders;
-        private readonly ICustomerService   _customers;
-        private readonly IVehicleService    _vehicles;
-        private readonly ITaskService       _tasks;      // ← NOWE
-        private readonly IUsedPartService   _parts;      // ← NOWE
+        private readonly IOrderService    _orders;
+        private readonly ICustomerService _customers;
+        private readonly IVehicleService  _vehicles;
+        private readonly ITaskService     _tasks;
+        private readonly IUsedPartService _parts;
 
         public ServiceOrdersController(
             IOrderService      orders,
             ICustomerService   customers,
             IVehicleService    vehicles,
-            ITaskService       tasks,       // ← NOWE
-            IUsedPartService   parts)       // ← NOWE
+            ITaskService       tasks,
+            IUsedPartService   parts)
         {
             _orders    = orders;
             _customers = customers;
@@ -55,15 +55,22 @@ namespace WorkshopManager.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ServiceOrderDto dto)
         {
+            // pola tylko-do-odczytu usuwamy z walidacji
+            ModelState.Remove(nameof(dto.CustomerName));
+            ModelState.Remove(nameof(dto.VehicleReg));
+
             if (!ModelState.IsValid)
             {
-                await FillSelectListsAsync();
+                await FillSelectListsAsync(dto.CustomerId, dto.VehicleId);
                 return View(dto);
             }
 
-            // Set initial status
-            dto = dto with { Status = "New", CreatedAt = DateTime.UtcNow };
-    
+            dto = dto with
+            {
+                Status    = "New",
+                CreatedAt = DateTime.UtcNow
+            };
+
             await _orders.AddAsync(dto);
             return RedirectToAction(nameof(Index));
         }
@@ -75,7 +82,7 @@ namespace WorkshopManager.Controllers
             var order = await _orders.GetAsync(id);
             if (order is null) return NotFound();
 
-            await FillSelectListsAsync();
+            await FillSelectListsAsync(order.CustomerId, order.VehicleId);
             return View(order);
         }
 
@@ -84,9 +91,12 @@ namespace WorkshopManager.Controllers
         {
             if (id != dto.Id) return BadRequest();
 
+            ModelState.Remove(nameof(dto.CustomerName));
+            ModelState.Remove(nameof(dto.VehicleReg));
+
             if (!ModelState.IsValid)
             {
-                await FillSelectListsAsync();
+                await FillSelectListsAsync(dto.CustomerId, dto.VehicleId);
                 return View(dto);
             }
 
@@ -124,6 +134,28 @@ namespace WorkshopManager.Controllers
             return RedirectToAction(nameof(Details), new { id = orderId });
         }
 
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddExistingTasks(int orderId, int[] taskIds)
+        {
+            if (taskIds.Length == 0)
+                return RedirectToAction(nameof(Details), new { id = orderId });
+
+            var templates = await _tasks.GetManyAsync(taskIds);
+
+            foreach (var tpl in templates)
+            {
+                var dto = new ServiceTaskDto
+                {
+                    OrderId     = orderId,
+                    Description = tpl.Description,
+                    Price       = tpl.Price
+                };
+                await _tasks.AddAsync(dto);
+            }
+
+            return RedirectToAction(nameof(Details), new { id = orderId });
+        }
+
         /*─────────  Części (UsedPart)  ─────────────*/
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> AddPart(UsedPartDto dto)
@@ -139,14 +171,17 @@ namespace WorkshopManager.Controllers
             return RedirectToAction(nameof(Details), new { id = orderId });
         }
 
-        /*──────────────────────  HELPER  ─────────────────────*/
-        private async Task FillSelectListsAsync()
+        /*──────────────────────  HELPERS  ────────────────────*/
+        private async Task FillSelectListsAsync(int selectedCustomer = 0,
+                                                int selectedVehicle  = 0)
         {
             var customers = await _customers.GetAllAsync(null);
-            ViewBag.CustomerList = new SelectList(customers, "Id", "FullName");
+            ViewBag.CustomerList =
+                new SelectList(customers, "Id", "FullName", selectedCustomer);
 
-            var vehicles = await _vehicles.GetAllAsync(0); // 0 means all vehicles
-            ViewBag.VehicleList = new SelectList(vehicles, "Id", "RegistrationNumber");
+            var vehicles = await _vehicles.GetAllAsync(0);     // wszystkie
+            ViewBag.VehicleList =
+                new SelectList(vehicles, "Id", "RegistrationNumber", selectedVehicle);
         }
     }
 }

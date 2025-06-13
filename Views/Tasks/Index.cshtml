@@ -1,0 +1,31 @@
+﻿@model IEnumerable<WorkshopManager.DTOs.ServiceTaskDto>
+@{
+    ViewData["Title"] = "Lista czynności";
+    int orderId = Context.Request.Query.ContainsKey("orderId")
+        ? int.Parse(Context.Request.Query["orderId"])
+        : 0;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<a asp-action="Create" asp-route-orderId="@orderId"
+   class="btn btn-primary mb-3">Nowa czynność</a>
+
+<table class="table table-striped">
+    <thead>
+    <tr><th>Zlecenie</th><th>Opis</th><th class="text-end">Cena</th><th></th></tr>
+    </thead>
+    <tbody>
+    @foreach (var t in Model) {
+        <tr>
+            <td>@t.OrderId</td>
+            <td>@t.Description</td>
+            <td class="text-end">@t.Price:C</td>
+            <td class="text-end">
+                <a asp-action="Edit"   asp-route-id="@t.Id">Edytuj</a> |
+                <a asp-action="Delete" asp-route-id="@t.Id">Usuń</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

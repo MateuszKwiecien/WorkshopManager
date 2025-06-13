@@ -1,0 +1,10 @@
+﻿@model WorkshopManager.DTOs.ServiceTaskDto
+@{
+    ViewData["Title"] = "Nowa czynność";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Create" method="post">
+    <partial name="_TaskFormPartial" />
+</form>

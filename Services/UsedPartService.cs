@@ -35,4 +35,14 @@ public class UsedPartService : IUsedPartService
         _repo.Delete(entity);
         await _repo.SaveAsync();
     }
+    
+    public async Task<IEnumerable<PartDto>> GetManyAsync(IEnumerable<int> ids)
+    {
+        var list = await _repo.Query()
+            .Where(p => ids.Contains(p.Id))
+            .ToListAsync();
+
+        return _map.Map<IEnumerable<PartDto>>(list);
+    }
+
 }

@@ -1,4 +1,5 @@
 ﻿using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using WorkshopManager.DTOs;
 using WorkshopManager.Interfaces;
 using WorkshopManager.Models;
@@ -44,4 +45,14 @@ public class PartService : IPartService
         await _repo.SaveAsync();
         return true;
     }
+    
+    public async Task<IEnumerable<PartDto>> GetManyAsync(IEnumerable<int> ids)
+    {
+        var list = await _repo.Query()
+            .Where(p => ids.Contains(p.Id))
+            .ToListAsync();
+
+        return _map.Map<IEnumerable<PartDto>>(list);
+    }
+
 }

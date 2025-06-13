@@ -8,4 +8,6 @@ public interface IPartService
     Task AddAsync(PartDto dto);
     Task<bool> UpdateAsync(int id, PartDto dto);
     Task<bool> DeleteAsync(int id);
+    Task<IEnumerable<PartDto>> GetManyAsync(IEnumerable<int> ids);
+
 }

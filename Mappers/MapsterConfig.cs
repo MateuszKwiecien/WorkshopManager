@@ -57,6 +57,10 @@ namespace WorkshopManager.Mappers
             // Part ↔ PartDto
             cfg.NewConfig<Part,     PartDto>();
             cfg.NewConfig<PartDto,  Part>();
+            
+            // ServiceTask ↔ ServiceTaskDto
+            cfg.NewConfig<ServiceTask,    ServiceTaskDto>();
+            cfg.NewConfig<ServiceTaskDto, ServiceTask>();
         }
     }
 }

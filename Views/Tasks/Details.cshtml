@@ -1,0 +1,15 @@
+﻿@model WorkshopManager.DTOs.ServiceTaskDto
+@{
+    ViewData["Title"] = "Szczegóły czynności";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-borderless w-auto">
+    <tr><th>Zlecenie:</th> <td>@Model.OrderId</td></tr>
+    <tr><th>Opis:</th>     <td>@Model.Description</td></tr>
+    <tr><th>Cena:</th>     <td>@Model.Price:C</td></tr>
+</table>
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edytuj</a>
+<a asp-action="Index" asp-route-orderId="@Model.OrderId" class="btn btn-secondary">← Powrót</a>

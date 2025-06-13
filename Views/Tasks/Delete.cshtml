@@ -1,0 +1,18 @@
+﻿@model WorkshopManager.DTOs.ServiceTaskDto
+@{
+    ViewData["Title"] = "Usuń czynność";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="alert alert-warning">
+    Czy na pewno chcesz usunąć zadanie „@Model.Description” (@Model.Price:C)?
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="OrderId" />
+    <button type="submit" class="btn btn-danger">Tak, usuń</button>
+    <a asp-action="Index" asp-route-orderId="@Model.OrderId"
+       class="btn btn-secondary">Anuluj</a>
+</form>

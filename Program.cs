@@ -45,6 +45,7 @@ builder.Services.AddHostedService<IdentitySeeder>();
 builder.Services.AddScoped<ITaskService,      TaskService>();
 builder.Services.AddScoped<IUsedPartService,  UsedPartService>();
 builder.Services.AddScoped<IPartService, PartService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
 
 
 // ░░░ Middleware ░░░─────────────────────────────────────────────────────────

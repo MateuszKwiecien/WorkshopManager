@@ -1,32 +1,76 @@
 ﻿using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using WorkshopManager.DTOs;
 using WorkshopManager.Interfaces;
 using WorkshopManager.Models;
 
 namespace WorkshopManager.Services;
 
+/// <inheritdoc />
 public class TaskService : ITaskService
 {
     private readonly IRepository<ServiceTask> _repo;
-    private readonly IMapper _map;
-    public TaskService(IRepository<ServiceTask> r, IMapper m)
-    { _repo = r; _map = m; }
+    private readonly IMapper                  _map;
 
-    public async Task<IEnumerable<ServiceTaskDto>> ListAsync(int orderId) =>
-        _map.Map<IEnumerable<ServiceTaskDto>>(
-            await _repo.ListAsync(t => t.ServiceOrderId == orderId));
+    public TaskService(IRepository<ServiceTask> repo, IMapper map)
+    {
+        _repo = repo;
+        _map  = map;
+    }
 
+    /*──── LISTA ───────────────────────────────────────────*/
+
+    public async Task<IEnumerable<ServiceTaskDto>> ListAsync(int orderId)
+    {
+        var list = await _repo.ListAsync(orderId == 0
+            ? null
+            : t => t.Id == orderId);
+
+        return _map.Map<IEnumerable<ServiceTaskDto>>(list);
+    }
+
+    /*──── SZCZEGÓŁ ────────────────────────────────────────*/
+
+    public async Task<ServiceTaskDto?> GetAsync(int id)
+        => _map.Map<ServiceTaskDto?>(await _repo.GetByIdAsync(id));
+
+    /*──── CREATE ─────────────────────────────────────────*/
 
     public async Task AddAsync(ServiceTaskDto dto)
     {
         await _repo.AddAsync(_map.Map<ServiceTask>(dto));
         await _repo.SaveAsync();
     }
-    public async Task DeleteAsync(int id)
+
+    /*──── UPDATE ─────────────────────────────────────────*/
+
+    public async Task<bool> UpdateAsync(int id, ServiceTaskDto dto)
     {
-        var t = await _repo.GetByIdAsync(id);
-        if (t is null) return;
-        _repo.Delete(t);
+        var entity = await _repo.GetByIdAsync(id);
+        if (entity is null) return false;
+
+        _map.Map(dto, entity);          // nadpisuje pola Description, Price, OrderId
         await _repo.SaveAsync();
+        return true;
+    }
+
+    /*──── DELETE ─────────────────────────────────────────*/
+
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var entity = await _repo.GetByIdAsync(id);
+        if (entity is null) return false;
+
+        _repo.Delete(entity);
+        await _repo.SaveAsync();
+        return true;
+    }
+    
+    public async Task<IEnumerable<ServiceTaskDto>> GetManyAsync(IEnumerable<int> ids)
+    {
+        var list = await _repo.Query()
+            .Where(t => ids.Contains(t.Id))
+            .ToListAsync();
+        return _map.Map<IEnumerable<ServiceTaskDto>>(list);
     }
 }
