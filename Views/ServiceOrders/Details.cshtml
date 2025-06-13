@@ -1,48 +1,118 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using WorkshopManager.Interfaces
+@using Microsoft.AspNetCore.Mvc.Rendering
 @model WorkshopManager.DTOs.ServiceOrderDto
 @inject ITaskService     TaskSvc
 @inject IUsedPartService PartSvc
+@inject IPartService     PartCatalog
 
 @{
+    /* pełne dane do wyświetlenia */
     var tasks = await TaskSvc.ListAsync(Model.Id);
     var parts = await PartSvc.ListAsync(Model.Id);
+
     var sumTasks = tasks.Sum(t => t.Price);
     var sumParts = parts.Sum(p => p.Quantity * p.UnitPrice);
-    var total = sumTasks + sumParts;
+    var total    = sumTasks + sumParts;
+
+    /* katalog części do comboboxa */
+    var partsList = await PartCatalog.GetAllAsync(null);
 }
 
 <h3>Zlecenie #@Model.Id – @Model.Status</h3>
+<p>
+    <b>Klient:</b>  @Model.CustomerName<br/>
+    <b>Pojazd:</b>  @Model.VehicleReg
+</p>
 
-<p><b>Klient:</b> @Model.CustomerName<br/>
-    <b>Pojazd:</b> @Model.VehicleReg</p>
+<!--──────────── FORMULARZ: dodaj zadanie ────────────-->
+<form asp-action="AddTask" method="post" class="row g-2 mb-3">
+    <input type="hidden" name="OrderId" value="@Model.Id" />
+
+    <div class="col-md-6">
+        <input name="Description" class="form-control" placeholder="Opis zadania" required />
+    </div>
+    <div class="col-md-3">
+        <input name="Price" type="number" step="0.01" min="0"
+               class="form-control" placeholder="Cena robocizny" required />
+    </div>
+    <div class="col-md-3 d-grid">
+        <button type="submit" class="btn btn-success">Dodaj zadanie</button>
+    </div>
+</form>
 
 <h4>Zadania</h4>
-<table class="table">
-    <thead><tr><th>Opis</th><th class="text-end">Cena</th><th></th></tr></thead>
+<table class="table table-striped">
+    <thead>
+    <tr><th>Opis</th><th class="text-end">Cena</th><th></th></tr>
+    </thead>
     <tbody>
-    @foreach (var t in tasks) {
-        <partial name="_TaskRow" model="t"/>
+    @foreach (var t in tasks)
+    {
+        <partial name="_TaskRow" model="t" />
     }
     </tbody>
     <tfoot>
-    <tr><th class="text-end">Robocizna:</th><th class="text-end">@sumTasks:C</th><th></th></tr>
+    <tr>
+        <th class="text-end">Robocizna:</th>
+        <th class="text-end">@sumTasks:C</th>
+        <th></th>
+    </tr>
     </tfoot>
 </table>
 
+<!--──────────── FORMULARZ: dodaj część ────────────-->
+<form asp-action="AddPart" method="post" class="row g-2 mb-3">
+    <input type="hidden" name="OrderId" value="@Model.Id" />
+
+    <div class="col-md-4">
+        <select name="PartId"
+                asp-items="@(new SelectList(partsList, "Id", "Name"))"
+                class="form-select" required>
+            <option value="" disabled selected>-- wybierz część --</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <input name="Quantity" type="number" min="1" value="1"
+               class="form-control" required />
+    </div>
+    <div class="col-md-2">
+        <input name="UnitPrice" type="number" step="0.01" min="0"
+               class="form-control" placeholder="Cena szt." required />
+    </div>
+    <div class="col-md-4 d-grid">
+        <button type="submit" class="btn btn-success">Dodaj część</button>
+    </div>
+</form>
+
 <h4>Części</h4>
-<table class="table">
+<table class="table table-striped">
     <thead>
-    <tr><th>Nazwa</th><th class="text-end">Ilość</th><th class="text-end">Cena szt.</th><th class="text-end">Razem</th><th></th></tr>
+    <tr>
+        <th>Nazwa</th>
+        <th class="text-end">Ilość</th>
+        <th class="text-end">Cena&nbsp;szt.</th>
+        <th class="text-end">Razem</th>
+        <th></th>
+    </tr>
     </thead>
     <tbody>
-    @foreach (var p in parts) {
-        <partial name="_UsedPartRow" model="p"/>
+    @foreach (var p in parts)
+    {
+        <partial name="_UsedPartRow" model="p" />
     }
     </tbody>
     <tfoot>
-    <tr><th colspan="3" class="text-end">Części:</th><th class="text-end">@sumParts:C</th><th></th></tr>
-    <tr class="table-secondary"><th colspan="3" class="text-end">Łącznie:</th><th class="text-end">@total:C</th><th></th></tr>
+    <tr>
+        <th colspan="3" class="text-end">Części:</th>
+        <th class="text-end">@sumParts:C</th>
+        <th></th>
+    </tr>
+    <tr class="table-secondary">
+        <th colspan="3" class="text-end">Łącznie:</th>
+        <th class="text-end">@total:C</th>
+        <th></th>
+    </tr>
     </tfoot>
 </table>
 

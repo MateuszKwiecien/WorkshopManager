@@ -6,7 +6,7 @@ namespace WorkshopManager.Services
     {
         private readonly IServiceProvider _provider;
         private static readonly string[] Roles =
-            { "Admin", "Mechanic", "Recepcjonista" };
+            { "Admin", "Mechanik", "Recepcjonista" };
 
         public IdentitySeeder(IServiceProvider provider) => _provider = provider;
 

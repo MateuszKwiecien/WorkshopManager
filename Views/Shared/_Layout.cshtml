@@ -46,6 +46,12 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="ServiceOrders" asp-action="Index">Zlecenia</a>
                         </li>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Recepcjonista"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Parts" asp-action="Index">Części</a>
+                            </li>
+                        }
                     }
                 </ul>
 

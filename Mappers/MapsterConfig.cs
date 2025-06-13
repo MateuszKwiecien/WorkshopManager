@@ -53,6 +53,10 @@ namespace WorkshopManager.Mappers
 
             cfg.NewConfig<UsedPartDto, UsedPart>()
                 .Map(d => d.ServiceOrderId, s => s.OrderId);
+            
+            // Part ↔ PartDto
+            cfg.NewConfig<Part,     PartDto>();
+            cfg.NewConfig<PartDto,  Part>();
         }
     }
 }
