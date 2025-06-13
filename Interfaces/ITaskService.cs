@@ -13,6 +13,4 @@ public interface ITaskService
     Task<bool> UpdateAsync(int id, ServiceTaskDto dto);
 
     Task<bool> DeleteAsync(int id);
-    
-    Task<IEnumerable<ServiceTaskDto>> GetManyAsync(IEnumerable<int> ids);
 }

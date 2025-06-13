@@ -123,36 +123,18 @@ namespace WorkshopManager.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> AddTask(ServiceTaskDto dto)
         {
+            if (dto.OrderId == 0)
+                return BadRequest("Brak OrderId");
+
             await _tasks.AddAsync(dto);
             return RedirectToAction(nameof(Details), new { id = dto.OrderId });
         }
+
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteTask(int id, int orderId)
         {
             await _tasks.DeleteAsync(id);
-            return RedirectToAction(nameof(Details), new { id = orderId });
-        }
-
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddExistingTasks(int orderId, int[] taskIds)
-        {
-            if (taskIds.Length == 0)
-                return RedirectToAction(nameof(Details), new { id = orderId });
-
-            var templates = await _tasks.GetManyAsync(taskIds);
-
-            foreach (var tpl in templates)
-            {
-                var dto = new ServiceTaskDto
-                {
-                    OrderId     = orderId,
-                    Description = tpl.Description,
-                    Price       = tpl.Price
-                };
-                await _tasks.AddAsync(dto);
-            }
-
             return RedirectToAction(nameof(Details), new { id = orderId });
         }
 

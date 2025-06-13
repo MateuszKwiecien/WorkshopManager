@@ -60,7 +60,10 @@ namespace WorkshopManager.Mappers
             
             // ServiceTask ↔ ServiceTaskDto
             cfg.NewConfig<ServiceTask,    ServiceTaskDto>();
-            cfg.NewConfig<ServiceTaskDto, ServiceTask>();
+            // MapsterConfig.cs
+            cfg.NewConfig<ServiceTaskDto, ServiceTask>()
+                .Map(d => d.ServiceOrderId, s => s.OrderId);
+
         }
     }
 }

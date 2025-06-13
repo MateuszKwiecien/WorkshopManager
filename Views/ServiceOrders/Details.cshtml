@@ -30,27 +30,6 @@
     <b>Pojazd:</b>  @Model.VehicleReg
 </p>
 
-<!--──────────── FORMULARZ: dodaj istniejące czynności ────────────-->
-<form asp-action="AddExistingTasks" method="post" class="row g-2 mb-3">
-    <input type="hidden" name="orderId" value="@Model.Id" />
-
-    <div class="col-md-6">
-        <select name="taskIds" multiple size="5"
-                asp-items="@(new SelectList(catalogTasks, "Id", "Description"))"
-                class="form-select">
-        </select>
-    </div>
-
-    <div class="col-md-3 d-grid">
-        <button type="submit" class="btn btn-success">
-            Dodaj zaznaczone czynności
-        </button>
-    </div>
-    <div class="col-md-3 small align-self-center">
-        <em>(Ctrl/⌘ + klik, aby zaznaczyć kilka)</em>
-    </div>
-</form>
-
 <!--──────────── FORMULARZ: dodaj zadanie „ad-hoc” ────────────-->
 <form asp-action="AddTask" method="post" class="row g-2 mb-3">
     <input type="hidden" name="OrderId" value="@Model.Id" />

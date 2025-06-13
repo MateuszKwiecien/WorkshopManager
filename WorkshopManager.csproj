@@ -26,8 +26,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Views\ServiceOrders\" />
       <Folder Include="Views\Vehicles\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Views\Tasks\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Tasks\Delete.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Tasks\Details.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Tasks\Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Tasks\Index.cshtml" />
     </ItemGroup>
 
 </Project>

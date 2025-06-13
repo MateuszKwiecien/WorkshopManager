@@ -18,17 +18,6 @@ public class TaskService : ITaskService
         _map  = map;
     }
 
-    /*──── LISTA ───────────────────────────────────────────*/
-
-    public async Task<IEnumerable<ServiceTaskDto>> ListAsync(int orderId)
-    {
-        var list = await _repo.ListAsync(orderId == 0
-            ? null
-            : t => t.Id == orderId);
-
-        return _map.Map<IEnumerable<ServiceTaskDto>>(list);
-    }
-
     /*──── SZCZEGÓŁ ────────────────────────────────────────*/
 
     public async Task<ServiceTaskDto?> GetAsync(int id)
@@ -38,9 +27,15 @@ public class TaskService : ITaskService
 
     public async Task AddAsync(ServiceTaskDto dto)
     {
-        await _repo.AddAsync(_map.Map<ServiceTask>(dto));
+        var entity = _map.Map<ServiceTask>(dto);
+
+        // awaryjne przypisanie FK (gdyby mapowanie nie skopiowało pola)
+        entity.ServiceOrderId = dto.OrderId;
+
+        await _repo.AddAsync(entity);
         await _repo.SaveAsync();
     }
+
 
     /*──── UPDATE ─────────────────────────────────────────*/
 
@@ -73,4 +68,15 @@ public class TaskService : ITaskService
             .ToListAsync();
         return _map.Map<IEnumerable<ServiceTaskDto>>(list);
     }
+    
+    public async Task<IEnumerable<ServiceTaskDto>> ListAsync(int orderId)
+    {
+        var list = await _repo.Query()                     // IQueryable<ServiceTask>
+            .Where(t => t.ServiceOrderId == orderId)
+            .OrderBy(t => t.Id)
+            .ToListAsync();
+
+        return _map.Map<IEnumerable<ServiceTaskDto>>(list);
+    }
+
 }
