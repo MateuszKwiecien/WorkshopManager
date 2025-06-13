@@ -1,206 +1,213 @@
-// Controllers/ServiceOrdersController.cs
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
 using WorkshopManager.DTOs;
 using WorkshopManager.Interfaces;
 
-namespace WorkshopManager.Controllers
+namespace WorkshopManager.Controllers;
+
+[Authorize]
+public class ServiceOrdersController : Controller
 {
-    [Authorize]                                     // dostęp tylko dla zalogowanych
-    public class ServiceOrdersController : Controller
+    private readonly IOrderService      _orders;
+    private readonly ICustomerService   _customers;
+    private readonly IVehicleService    _vehicles;
+    private readonly ITaskService       _tasks;
+    private readonly IUsedPartService   _usedParts;
+    private readonly IPartService       _partsCatalog;
+    private readonly ILogger<ServiceOrdersController> _log;
+
+    public ServiceOrdersController(IOrderService    orders,
+                                   ICustomerService customers,
+                                   IVehicleService  vehicles,
+                                   ITaskService     tasks,
+                                   IUsedPartService parts,
+                                   IPartService     partsCatalog,
+                                   ILogger<ServiceOrdersController> log)
     {
-        private readonly IOrderService    _orders;
-        private readonly ICustomerService _customers;
-        private readonly IVehicleService  _vehicles;
-        private readonly ITaskService     _tasks;
-        private readonly IUsedPartService _usedParts;
-        private readonly IPartService _partsCatalog;   // katalog Parts
+        _orders       = orders;
+        _customers    = customers;
+        _vehicles     = vehicles;
+        _tasks        = tasks;
+        _usedParts    = parts;
+        _partsCatalog = partsCatalog;
+        _log          = log;
+    }
 
-        public ServiceOrdersController(
-            IOrderService    orders,
-            ICustomerService customers,
-            IVehicleService  vehicles,
-            ITaskService     tasks,
-            IUsedPartService usedParts,
-            IPartService     partsCatalog)   // ← NOWE
+    public async Task<IActionResult> Index(string? status = null)
+    {
+        ViewBag.FilterStatus = status ?? "All";
+        return View(await _orders.GetAllAsync(status));
+    }
+
+    public async Task<IActionResult> Details(int id)
+    {
+        var dto = await _orders.GetAsync(id);
+        return dto is null ? NotFound() : View(dto);
+    }
+
+    public async Task<IActionResult> Create()
+    {
+        await FillSelectListsAsync();
+        return View();
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(ServiceOrderDto dto)
+    {
+        ModelState.Remove(nameof(dto.CustomerName));
+        ModelState.Remove(nameof(dto.VehicleReg));
+
+        if (!ModelState.IsValid)
         {
-            _orders       = orders;
-            _customers    = customers;
-            _vehicles     = vehicles;
-            _tasks        = tasks;
-            _usedParts    = usedParts;
-            _partsCatalog = partsCatalog;    // ← NOWE
+            await FillSelectListsAsync(dto.CustomerId, dto.VehicleId);
+            return View(dto);
         }
 
-        /*──────────────────────  LISTA  ─────────────────────*/
-        public async Task<IActionResult> Index(string? status = null)
+        dto = dto with { Status = "New", CreatedAt = DateTime.UtcNow };
+
+        try
         {
-            ViewBag.FilterStatus = status ?? "All";
-            return View(await _orders.GetAllAsync(status));
-        }
-
-        /*──────────────────────  SZCZEGÓŁ  ───────────────────*/
-        public async Task<IActionResult> Details(int id)
-        {
-            var order = await _orders.GetAsync(id);
-            return order is null ? NotFound() : View(order);
-        }
-
-        /*──────────────────────  CREATE  ─────────────────────*/
-        [HttpGet]
-        public async Task<IActionResult> Create()
-        {
-            await FillSelectListsAsync();
-            return View();
-        }
-
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ServiceOrderDto dto)
-        {
-            // pola tylko-do-odczytu usuwamy z walidacji
-            ModelState.Remove(nameof(dto.CustomerName));
-            ModelState.Remove(nameof(dto.VehicleReg));
-
-            if (!ModelState.IsValid)
-            {
-                await FillSelectListsAsync(dto.CustomerId, dto.VehicleId);
-                return View(dto);
-            }
-
-            dto = dto with
-            {
-                Status    = "New",
-                CreatedAt = DateTime.UtcNow
-            };
-
             await _orders.AddAsync(dto);
+            _log.LogInformation("ServiceOrder #{Id} created", dto.Id);
             return RedirectToAction(nameof(Index));
         }
-
-        /*──────────────────────  EDIT  ───────────────────────*/
-        [HttpGet]
-        public async Task<IActionResult> Edit(int id)
+        catch (Exception ex)
         {
-            var order = await _orders.GetAsync(id);
-            if (order is null) return NotFound();
+            _log.LogError(ex, "Create(ServiceOrder) failed {@Dto}", dto);
+            await FillSelectListsAsync(dto.CustomerId, dto.VehicleId);
+            return View("Error");
+        }
+    }
 
-            await FillSelectListsAsync(order.CustomerId, order.VehicleId);
-            return View(order);
+    public async Task<IActionResult> Edit(int id)
+    {
+        var dto = await _orders.GetAsync(id);
+        if (dto is null) return NotFound();
+
+        await FillSelectListsAsync(dto.CustomerId, dto.VehicleId);
+        return View(dto);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, ServiceOrderDto dto)
+    {
+        if (id != dto.Id) return BadRequest();
+
+        ModelState.Remove(nameof(dto.CustomerName));
+        ModelState.Remove(nameof(dto.VehicleReg));
+
+        if (!ModelState.IsValid)
+        {
+            await FillSelectListsAsync(dto.CustomerId, dto.VehicleId);
+            return View(dto);
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, ServiceOrderDto dto)
+        try
         {
-            if (id != dto.Id) return BadRequest();
-
-            ModelState.Remove(nameof(dto.CustomerName));
-            ModelState.Remove(nameof(dto.VehicleReg));
-
-            if (!ModelState.IsValid)
-            {
-                await FillSelectListsAsync(dto.CustomerId, dto.VehicleId);
-                return View(dto);
-            }
-
             var ok = await _orders.UpdateAsync(id, dto);
             return ok ? RedirectToAction(nameof(Index)) : NotFound();
         }
-
-        /*──────────────────────  DELETE  ─────────────────────*/
-        [HttpGet]
-        public async Task<IActionResult> Delete(int id)
+        catch (Exception ex)
         {
-            var order = await _orders.GetAsync(id);
-            return order is null ? NotFound() : View(order);
+            _log.LogError(ex, "Edit(ServiceOrder) failed {@Dto}", dto);
+            await FillSelectListsAsync(dto.CustomerId, dto.VehicleId);
+            return View("Error");
         }
+    }
 
-        [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+    public async Task<IActionResult> Delete(int id)
+    {
+        var dto = await _orders.GetAsync(id);
+        return dto is null ? NotFound() : View(dto);
+    }
+
+    [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        try
         {
             var ok = await _orders.DeleteAsync(id);
             return ok ? RedirectToAction(nameof(Index)) : NotFound();
         }
-
-        /*─────────  Zadania (ServiceTask)  ─────────*/
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddTask(ServiceTaskDto dto)
+        catch (Exception ex)
         {
-            if (dto.OrderId == 0)
-                return BadRequest("Brak OrderId");
+            _log.LogError(ex, "Delete(ServiceOrder) failed Id={Id}", id);
+            return View("Error");
+        }
+    }
 
+    /*──────── Zadania ────────*/
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddTask(ServiceTaskDto dto)
+    {
+        try
+        {
             await _tasks.AddAsync(dto);
             return RedirectToAction(nameof(Details), new { id = dto.OrderId });
         }
-
-
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteTask(int id, int orderId)
+        catch (Exception ex)
         {
-            await _tasks.DeleteAsync(id);
+            _log.LogError(ex, "AddTask failed {@Dto}", dto);
+            return View("Error");
+        }
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteTask(int id, int orderId)
+    {
+        await _tasks.DeleteAsync(id);
+        return RedirectToAction(nameof(Details), new { id = orderId });
+    }
+
+    /*──────── Części ────────*/
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddExistingParts(int orderId, int[] partIds)
+    {
+        if (partIds.Length == 0)
             return RedirectToAction(nameof(Details), new { id = orderId });
-        }
 
-        /*─────────  Części (UsedPart)  ─────────────*/
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddPart(UsedPartDto dto)
+        var catalog = await _partsCatalog.GetManyAsync(partIds);
+
+        try
         {
-            await _usedParts.AddAsync(dto);
-            return RedirectToAction(nameof(Details), new { id = dto.OrderId });
-        }
-        
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddExistingParts(
-            int orderId,
-            int[] partIds,
-            int[] quantities)          // ← NOWY parametr
-        {
-            if (partIds.Length == 0)
-                return RedirectToAction(nameof(Details), new { id = orderId });
-
-            // pobieramy wszystkie zaznaczone części 1 zapytaniem
-            var catalog = await _partsCatalog.GetManyAsync(partIds);
-
-            for (int i = 0; i < partIds.Length; i++)
+            foreach (var p in catalog)
             {
-                var p   = catalog.First(c => c.Id == partIds[i]);
-                var qty = i < quantities.Length ? quantities[i] : 1;
-
                 var dto = new UsedPartDto(
-                    Id:        0,
-                    OrderId:   orderId,
-                    PartId:    p.Id,
-                    Quantity:  qty,
-                    UnitPrice: p.UnitPrice,
-                    PartName:  p.Name);
+                    0,             // id (auto)
+                    orderId,
+                    p.Id,
+                    1,             // Qty domyślnie 1
+                    p.UnitPrice,
+                    p.Name);
 
                 await _usedParts.AddAsync(dto);
             }
 
             return RedirectToAction(nameof(Details), new { id = orderId });
         }
-
-
-
-
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeletePart(int id, int orderId)
+        catch (Exception ex)
         {
-            await _usedParts.DeleteAsync(id);
-            return RedirectToAction(nameof(Details), new { id = orderId });
+            _log.LogError(ex, "AddExistingParts failed order={Order} parts={Ids}", orderId, string.Join(",", partIds));
+            return View("Error");
         }
+    }
 
-        /*──────────────────────  HELPERS  ────────────────────*/
-        private async Task FillSelectListsAsync(int selectedCustomer = 0,
-                                                int selectedVehicle  = 0)
-        {
-            var customers = await _customers.GetAllAsync(null);
-            ViewBag.CustomerList =
-                new SelectList(customers, "Id", "FullName", selectedCustomer);
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeletePart(int id, int orderId)
+    {
+        await _usedParts.DeleteAsync(id);
+        return RedirectToAction(nameof(Details), new { id = orderId });
+    }
 
-            var vehicles = await _vehicles.GetAllAsync(0);     // wszystkie
-            ViewBag.VehicleList =
-                new SelectList(vehicles, "Id", "RegistrationNumber", selectedVehicle);
-        }
+    /*──────── helper ────────*/
+    private async Task FillSelectListsAsync(int selectedCustomer = 0, int selectedVehicle = 0)
+    {
+        var customers = await _customers.GetAllAsync(null);
+        ViewBag.CustomerList = new SelectList(customers, "Id", "FullName", selectedCustomer);
+
+        var vehicles = await _vehicles.GetAllAsync(0);
+        ViewBag.VehicleList = new SelectList(vehicles, "Id", "RegistrationNumber", selectedVehicle);
     }
 }

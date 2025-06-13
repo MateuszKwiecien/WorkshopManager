@@ -1,88 +1,107 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
 using WorkshopManager.Models;
 using WorkshopManager.ViewModels;
 
-namespace WorkshopManager.Controllers
+namespace WorkshopManager.Controllers;
+
+public class AccountController : Controller
 {
-    public class AccountController : Controller
+    private readonly UserManager<ApplicationUser> _userMgr;
+    private readonly SignInManager<ApplicationUser> _signInMgr;
+    private readonly RoleManager<IdentityRole> _roleMgr;
+    private readonly ILogger<AccountController> _log;
+
+    public AccountController(UserManager<ApplicationUser>  userMgr,
+                             SignInManager<ApplicationUser> signInMgr,
+                             RoleManager<IdentityRole>      roleMgr,
+                             ILogger<AccountController>      log)
     {
-        private readonly UserManager<ApplicationUser> _userMgr;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly RoleManager<IdentityRole> _roleMgr;
+        _userMgr  = userMgr;
+        _signInMgr = signInMgr;
+        _roleMgr   = roleMgr;
+        _log       = log;
+    }
 
-        public AccountController(UserManager<ApplicationUser>  userMgr,
-            SignInManager<ApplicationUser> signInMgr,
-            RoleManager<IdentityRole>      roleMgr)
+    // GET /Account/Register
+    public IActionResult Register() => View();
+
+    // POST /Account/Register
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Register(RegisterVm vm)
+    {
+        if (!ModelState.IsValid) return View(vm);
+
+        try
         {
-            _userMgr  = userMgr;
-            _signInManager = signInMgr;
-            _roleMgr   = roleMgr;
-        }
-
-/*──── GET: /Account/Register ────*/
-        [HttpGet]
-        public IActionResult Register()
-        {
-            ViewBag.RoleList = new SelectList(new[] { "Admin", "Mechanik", "Recepcjonista" });
-            return View();
-        }
-
-/*──── POST: /Account/Register ────*/
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterVm vm)
-        {
-            if (!ModelState.IsValid)
-            {
-                ViewBag.RoleList = new SelectList(new[] { "Admin", "Mechanik", "Recepcjonista" }, vm.Role);
-                return View(vm);
-            }
-
-            // upewnij się, że podana rola istnieje
-            if (!await _roleMgr.RoleExistsAsync(vm.Role))
-            {
-                ModelState.AddModelError("Role", "Wybrana rola nie istnieje.");
-                ViewBag.RoleList = new SelectList(new[] { "Admin", "Mechanik", "Recepcjonista" }, vm.Role);
-                return View(vm);
-            }
-
             var user = new ApplicationUser { UserName = vm.Email, Email = vm.Email };
             var result = await _userMgr.CreateAsync(user, vm.Password);
 
             if (result.Succeeded)
             {
-                await _userMgr.AddToRoleAsync(user, vm.Role);          // ← przypisz rolę
-                await _signInManager.SignInAsync(user, isPersistent: false);
+                await _signInMgr.SignInAsync(user, isPersistent: false);
+                _log.LogInformation("User {Email} registered", vm.Email);
                 return RedirectToAction("Index", "Home");
             }
 
-            foreach (var error in result.Errors)
-                ModelState.AddModelError(string.Empty, error.Description);
+            foreach (var e in result.Errors)
+                ModelState.AddModelError(string.Empty, e.Description);
 
-            ViewBag.RoleList = new SelectList(new[] { "Admin", "Mechanik", "Recepcjonista" }, vm.Role);
             return View(vm);
         }
-
-        [HttpGet]
-        public IActionResult Login() => View();
-
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginVm vm)
+        catch (Exception ex)
         {
-            if (!ModelState.IsValid) return View(vm);
+            _log.LogError(ex, "Register failed for {Email}", vm.Email);
+            return View("Error");
+        }
+    }
 
-            var result = await _signInManager.PasswordSignInAsync(vm.Email, vm.Password, vm.RememberMe, false);
-            if (result.Succeeded) return RedirectToAction("Index", "Home");
+    // GET /Account/Login
+    public IActionResult Login(string? returnUrl = null)
+    {
+        ViewBag.ReturnUrl = returnUrl;
+        return View();
+    }
 
-            ModelState.AddModelError("", "Nieprawidłowe dane logowania");
+    // POST /Account/Login
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Login(LoginVm vm, string? returnUrl = null)
+    {
+        if (!ModelState.IsValid) return View(vm);
+
+        try
+        {
+            var result = await _signInMgr.PasswordSignInAsync(vm.Email, vm.Password, vm.RememberMe, false);
+            if (result.Succeeded)
+            {
+                _log.LogInformation("User {Email} logged in", vm.Email);
+                return LocalRedirect(returnUrl ?? Url.Action("Index", "Home")!);
+            }
+
+            ModelState.AddModelError(string.Empty, "Nieprawidłowe dane logowania");
             return View(vm);
         }
-
-        public async Task<IActionResult> Logout()
+        catch (Exception ex)
         {
-            await _signInManager.SignOutAsync();
+            _log.LogError(ex, "Login failed for {Email}", vm.Email);
+            return View("Error");
+        }
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Logout()
+    {
+        try
+        {
+            await _signInMgr.SignOutAsync();
+            _log.LogInformation("User logged out");
             return RedirectToAction("Index", "Home");
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Logout failed");
+            return View("Error");
         }
     }
 }

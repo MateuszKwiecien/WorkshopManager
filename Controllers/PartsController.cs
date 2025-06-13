@@ -1,82 +1,89 @@
-﻿// Controllers/PartsController.cs
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using WorkshopManager.DTOs;
 using WorkshopManager.Interfaces;
 
 namespace WorkshopManager.Controllers;
 
-[Authorize(Roles = "Admin,Recepcjonista")]
+[Authorize]
 public class PartsController : Controller
 {
     private readonly IPartService _service;
+    private readonly ILogger<PartsController> _log;
 
-    public PartsController(IPartService service) => _service = service;
+    public PartsController(IPartService service,
+                           ILogger<PartsController> log)
+    {
+        _service = service;
+        _log     = log;
+    }
 
-    /*──────── LISTA ─────────────────────────────────────────*/
+    public async Task<IActionResult> Index()
+        => View(await _service.GetAllAsync(null));
 
-    // GET: /Parts?search=filtr
-    public async Task<IActionResult> Index(string? search = null)
-        => View(await _service.GetAllAsync(search));
-
-    /*──────── SZCZEGÓŁ ──────────────────────────────────────*/
-
-    // GET: /Parts/Details/5
-    public async Task<IActionResult> Details(int id)
-        => (await _service.GetAsync(id)) is { } dto
-              ? View(dto)
-              : NotFound();
-
-    /*──────── CREATE ───────────────────────────────────────*/
-
-    // GET: /Parts/Create
-    [HttpGet]
     public IActionResult Create() => View();
 
-    // POST: /Parts/Create
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(PartDto dto)
     {
         if (!ModelState.IsValid) return View(dto);
 
-        await _service.AddAsync(dto);
-        return RedirectToAction(nameof(Index));
+        try
+        {
+            await _service.AddAsync(dto);
+            _log.LogInformation("Part {Name} added", dto.Name);
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Create(Part) failed for {@Dto}", dto);
+            return View("Error");
+        }
     }
 
-    /*──────── EDIT ─────────────────────────────────────────*/
-
-    // GET: /Parts/Edit/5
-    [HttpGet]
     public async Task<IActionResult> Edit(int id)
-        => (await _service.GetAsync(id)) is { } dto
-              ? View(dto)
-              : NotFound();
+    {
+        var dto = await _service.GetAsync(id);
+        return dto is null ? NotFound() : View(dto);
+    }
 
-    // POST: /Parts/Edit/5
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, PartDto dto)
     {
         if (id != dto.Id) return BadRequest();
         if (!ModelState.IsValid) return View(dto);
 
-        var ok = await _service.UpdateAsync(id, dto);
-        return ok ? RedirectToAction(nameof(Index)) : NotFound();
+        try
+        {
+            var ok = await _service.UpdateAsync(id, dto);
+            return ok ? RedirectToAction(nameof(Index)) : NotFound();
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Edit(Part) failed for {@Dto}", dto);
+            return View("Error");
+        }
     }
 
-    /*──────── DELETE ───────────────────────────────────────*/
-
-    // GET: /Parts/Delete/5
-    [HttpGet]
     public async Task<IActionResult> Delete(int id)
-        => (await _service.GetAsync(id)) is { } dto
-              ? View(dto)
-              : NotFound();
+    {
+        var dto = await _service.GetAsync(id);
+        return dto is null ? NotFound() : View(dto);
+    }
 
-    // POST: /Parts/Delete/5
     [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var ok = await _service.DeleteAsync(id);
-        return ok ? RedirectToAction(nameof(Index)) : NotFound();
+        try
+        {
+            var ok = await _service.DeleteAsync(id);
+            return ok ? RedirectToAction(nameof(Index)) : NotFound();
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Delete(Part) failed for Id={Id}", id);
+            return View("Error");
+        }
     }
 }

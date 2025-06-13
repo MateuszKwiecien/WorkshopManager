@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using WorkshopManager.DTOs;
 using WorkshopManager.Interfaces;
 
@@ -9,32 +10,49 @@ namespace WorkshopManager.Controllers;
 public class CustomersController : Controller
 {
     private readonly ICustomerService _srv;
+    private readonly ILogger<CustomersController> _log;
 
-    public CustomersController(ICustomerService service) => _srv = service;
+    public CustomersController(ICustomerService service,
+                               ILogger<CustomersController> log)
+    {
+        _srv = service;
+        _log = log;
+    }
 
-    /*──── LISTA ────*/
-    public async Task<IActionResult> Index(string? search = null)
-        => View(await _srv.GetAllAsync(search));
+    public async Task<IActionResult> Index()
+        => View(await _srv.GetAllAsync(null));
 
-    /*──── SZCZEGÓŁ ─*/
     public async Task<IActionResult> Details(int id)
-        => await _srv.GetAsync(id) is { } c ? View(c) : NotFound();
+    {
+        var dto = await _srv.GetAsync(id);
+        return dto is null ? NotFound() : View(dto);
+    }
 
-    /*──── CREATE ───*/
-    [HttpGet] public IActionResult Create() => View();
+    public IActionResult Create() => View();
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CustomerDto dto)
     {
         if (!ModelState.IsValid) return View(dto);
-        await _srv.AddAsync(dto);
-        return RedirectToAction(nameof(Index));
+
+        try
+        {
+            await _srv.AddAsync(dto);
+            _log.LogInformation("Customer {Name} added", dto.FullName);
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Create(Customer) failed for {@Dto}", dto);
+            return View("Error");
+        }
     }
 
-    /*──── EDIT ─────*/
-    [HttpGet]
     public async Task<IActionResult> Edit(int id)
-        => await _srv.GetAsync(id) is { } c ? View(c) : NotFound();
+    {
+        var dto = await _srv.GetAsync(id);
+        return dto is null ? NotFound() : View(dto);
+    }
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, CustomerDto dto)
@@ -42,19 +60,36 @@ public class CustomersController : Controller
         if (id != dto.Id) return BadRequest();
         if (!ModelState.IsValid) return View(dto);
 
-        var ok = await _srv.UpdateAsync(id, dto);
-        return ok ? RedirectToAction(nameof(Index)) : NotFound();
+        try
+        {
+            var ok = await _srv.UpdateAsync(id, dto);
+            return ok ? RedirectToAction(nameof(Index)) : NotFound();
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Edit(Customer) failed for {@Dto}", dto);
+            return View("Error");
+        }
     }
 
-    /*──── DELETE ───*/
-    [HttpGet]
     public async Task<IActionResult> Delete(int id)
-        => await _srv.GetAsync(id) is { } c ? View(c) : NotFound();
+    {
+        var dto = await _srv.GetAsync(id);
+        return dto is null ? NotFound() : View(dto);
+    }
 
     [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var ok = await _srv.DeleteAsync(id);
-        return ok ? RedirectToAction(nameof(Index)) : NotFound();
+        try
+        {
+            var ok = await _srv.DeleteAsync(id);
+            return ok ? RedirectToAction(nameof(Index)) : NotFound();
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Delete(Customer) failed for Id={Id}", id);
+            return View("Error");
+        }
     }
 }
