@@ -1,4 +1,6 @@
 ﻿// Mappers/MapsterConfig.cs
+
+using System.Diagnostics;
 using Mapster;
 using WorkshopManager.DTOs;
 using WorkshopManager.Models;
@@ -13,11 +15,18 @@ namespace WorkshopManager.Mappers
             cfg.NewConfig<Customer,     CustomerDto>();
             cfg.NewConfig<CustomerDto,  Customer>();
 
-            /*──────────── Vehicle ↔ VehicleDto ──────────────*/
-            cfg.NewConfig<Vehicle,      VehicleDto>()
-                .Map(d => d.CustomerName, s => s.Customer.FullName);
-
-            cfg.NewConfig<VehicleDto,   Vehicle>();
+            /*────────── Vehicle ↔ VehicleDto ──────────*/
+            cfg.NewConfig<Vehicle, VehicleDto>()
+                .ConstructUsing(s => new VehicleDto(
+                    s.Id,
+                    s.Make,
+                    s.Model,
+                    s.RegistrationNumber,
+                    s.Year,
+                    s.CustomerId,
+                    s.Customer != null ? s.Customer.FullName : "gowno"  // CustomerName
+                ));
+            cfg.NewConfig<VehicleDto, Vehicle>();    // odwrotny kierunek bez zmian
 
             /*──────────── ServiceOrder ↔ ServiceOrderDto ────*/
             cfg.NewConfig<ServiceOrder, ServiceOrderDto>()

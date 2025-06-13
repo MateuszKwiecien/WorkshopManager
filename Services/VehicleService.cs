@@ -21,22 +21,38 @@ public class VehicleService : IVehicleService
     public async Task<IEnumerable<VehicleDto>> GetAllAsync(int customerId)
     {
         IQueryable<Vehicle> query = _repo.Query()
-            .Include(v => v.Customer);   // ← DOŁĄCZ
+            .Include(v => v.Customer);
 
         if (customerId != 0)
             query = query.Where(v => v.CustomerId == customerId);
 
-        return _map.Map<IEnumerable<VehicleDto>>(await query.ToListAsync());
+        var dtoList = await query
+            .Select(v => new VehicleDto(
+                v.Id,
+                v.Make,
+                v.Model,
+                v.RegistrationNumber,
+                v.Year,
+                v.CustomerId,
+                v.Customer.FullName                // ← imię trafia bez Mapstera
+            ))
+            .ToListAsync();
+
+        return dtoList;
     }
+
 
     /*──────── SZCZEGÓŁ ────*/
     public async Task<VehicleDto?> GetAsync(int id)
     {
-        var vehicle = await _repo.Query()          // ← TEŻ przez Query()
-            .Include(v => v.Customer)
-            .FirstOrDefaultAsync(v => v.Id == id);
+        var v = await _repo.Query()
+            .Include(x => x.Customer)
+            .FirstOrDefaultAsync(x => x.Id == id);
 
-        return _map.Map<VehicleDto?>(vehicle);
+        return v is null ? null
+            : new VehicleDto(v.Id, v.Make, v.Model,
+                v.RegistrationNumber, v.Year,
+                v.CustomerId, v.Customer.FullName);
     }
 
     public async Task<int> AddAsync(VehicleDto dto)
